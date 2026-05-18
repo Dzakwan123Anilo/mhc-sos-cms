@@ -1,0 +1,47 @@
+K 25
+svn:wc:ra_dav:version-url
+V 66
+/svn/mensa/!svn/ver/1/application/libraries/PHPExcel/Writer/Excel5
+END
+BIFFwriter.php
+K 25
+svn:wc:ra_dav:version-url
+V 81
+/svn/mensa/!svn/ver/1/application/libraries/PHPExcel/Writer/Excel5/BIFFwriter.php
+END
+Workbook.php
+K 25
+svn:wc:ra_dav:version-url
+V 79
+/svn/mensa/!svn/ver/1/application/libraries/PHPExcel/Writer/Excel5/Workbook.php
+END
+Worksheet.php
+K 25
+svn:wc:ra_dav:version-url
+V 80
+/svn/mensa/!svn/ver/1/application/libraries/PHPExcel/Writer/Excel5/Worksheet.php
+END
+Xf.php
+K 25
+svn:wc:ra_dav:version-url
+V 73
+/svn/mensa/!svn/ver/1/application/libraries/PHPExcel/Writer/Excel5/Xf.php
+END
+Font.php
+K 25
+svn:wc:ra_dav:version-url
+V 75
+/svn/mensa/!svn/ver/1/application/libraries/PHPExcel/Writer/Excel5/Font.php
+END
+Parser.php
+K 25
+svn:wc:ra_dav:version-url
+V 77
+/svn/mensa/!svn/ver/1/application/libraries/PHPExcel/Writer/Excel5/Parser.php
+END
+Escher.php
+K 25
+svn:wc:ra_dav:version-url
+V 77
+/svn/mensa/!svn/ver/1/application/libraries/PHPExcel/Writer/Excel5/Escher.php
+END

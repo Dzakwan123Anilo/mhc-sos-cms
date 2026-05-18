@@ -1,0 +1,41 @@
+K 25
+svn:wc:ra_dav:version-url
+V 57
+/svn/mensa/!svn/ver/1/application/libraries/PHPExcel/Cell
+END
+Hyperlink.php
+K 25
+svn:wc:ra_dav:version-url
+V 71
+/svn/mensa/!svn/ver/1/application/libraries/PHPExcel/Cell/Hyperlink.php
+END
+AdvancedValueBinder.php
+K 25
+svn:wc:ra_dav:version-url
+V 81
+/svn/mensa/!svn/ver/1/application/libraries/PHPExcel/Cell/AdvancedValueBinder.php
+END
+DefaultValueBinder.php
+K 25
+svn:wc:ra_dav:version-url
+V 80
+/svn/mensa/!svn/ver/1/application/libraries/PHPExcel/Cell/DefaultValueBinder.php
+END
+IValueBinder.php
+K 25
+svn:wc:ra_dav:version-url
+V 74
+/svn/mensa/!svn/ver/1/application/libraries/PHPExcel/Cell/IValueBinder.php
+END
+DataValidation.php
+K 25
+svn:wc:ra_dav:version-url
+V 76
+/svn/mensa/!svn/ver/1/application/libraries/PHPExcel/Cell/DataValidation.php
+END
+DataType.php
+K 25
+svn:wc:ra_dav:version-url
+V 70
+/svn/mensa/!svn/ver/1/application/libraries/PHPExcel/Cell/DataType.php
+END

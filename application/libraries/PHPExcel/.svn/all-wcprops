@@ -1,0 +1,119 @@
+K 25
+svn:wc:ra_dav:version-url
+V 52
+/svn/mensa/!svn/ver/1/application/libraries/PHPExcel
+END
+ReferenceHelper.php
+K 25
+svn:wc:ra_dav:version-url
+V 72
+/svn/mensa/!svn/ver/1/application/libraries/PHPExcel/ReferenceHelper.php
+END
+DocumentSecurity.php
+K 25
+svn:wc:ra_dav:version-url
+V 73
+/svn/mensa/!svn/ver/1/application/libraries/PHPExcel/DocumentSecurity.php
+END
+WorksheetIterator.php
+K 25
+svn:wc:ra_dav:version-url
+V 74
+/svn/mensa/!svn/ver/1/application/libraries/PHPExcel/WorksheetIterator.php
+END
+Chart.php
+K 25
+svn:wc:ra_dav:version-url
+V 62
+/svn/mensa/!svn/ver/1/application/libraries/PHPExcel/Chart.php
+END
+Comment.php
+K 25
+svn:wc:ra_dav:version-url
+V 64
+/svn/mensa/!svn/ver/1/application/libraries/PHPExcel/Comment.php
+END
+HashTable.php
+K 25
+svn:wc:ra_dav:version-url
+V 66
+/svn/mensa/!svn/ver/1/application/libraries/PHPExcel/HashTable.php
+END
+Autoloader.php
+K 25
+svn:wc:ra_dav:version-url
+V 67
+/svn/mensa/!svn/ver/1/application/libraries/PHPExcel/Autoloader.php
+END
+Cell.php
+K 25
+svn:wc:ra_dav:version-url
+V 61
+/svn/mensa/!svn/ver/1/application/libraries/PHPExcel/Cell.php
+END
+Settings.php
+K 25
+svn:wc:ra_dav:version-url
+V 65
+/svn/mensa/!svn/ver/1/application/libraries/PHPExcel/Settings.php
+END
+IComparable.php
+K 25
+svn:wc:ra_dav:version-url
+V 68
+/svn/mensa/!svn/ver/1/application/libraries/PHPExcel/IComparable.php
+END
+IOFactory.php
+K 25
+svn:wc:ra_dav:version-url
+V 66
+/svn/mensa/!svn/ver/1/application/libraries/PHPExcel/IOFactory.php
+END
+NamedRange.php
+K 25
+svn:wc:ra_dav:version-url
+V 67
+/svn/mensa/!svn/ver/1/application/libraries/PHPExcel/NamedRange.php
+END
+RichText.php
+K 25
+svn:wc:ra_dav:version-url
+V 65
+/svn/mensa/!svn/ver/1/application/libraries/PHPExcel/RichText.php
+END
+Calculation.php
+K 25
+svn:wc:ra_dav:version-url
+V 68
+/svn/mensa/!svn/ver/1/application/libraries/PHPExcel/Calculation.php
+END
+DocumentProperties.php
+K 25
+svn:wc:ra_dav:version-url
+V 75
+/svn/mensa/!svn/ver/1/application/libraries/PHPExcel/DocumentProperties.php
+END
+Worksheet.php
+K 25
+svn:wc:ra_dav:version-url
+V 66
+/svn/mensa/!svn/ver/1/application/libraries/PHPExcel/Worksheet.php
+END
+Exception.php
+K 25
+svn:wc:ra_dav:version-url
+V 66
+/svn/mensa/!svn/ver/1/application/libraries/PHPExcel/Exception.php
+END
+CachedObjectStorageFactory.php
+K 25
+svn:wc:ra_dav:version-url
+V 83
+/svn/mensa/!svn/ver/1/application/libraries/PHPExcel/CachedObjectStorageFactory.php
+END
+Style.php
+K 25
+svn:wc:ra_dav:version-url
+V 62
+/svn/mensa/!svn/ver/1/application/libraries/PHPExcel/Style.php
+END

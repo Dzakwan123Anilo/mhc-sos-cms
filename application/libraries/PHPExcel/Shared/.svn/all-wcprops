@@ -1,0 +1,95 @@
+K 25
+svn:wc:ra_dav:version-url
+V 59
+/svn/mensa/!svn/ver/1/application/libraries/PHPExcel/Shared
+END
+PasswordHasher.php
+K 25
+svn:wc:ra_dav:version-url
+V 78
+/svn/mensa/!svn/ver/1/application/libraries/PHPExcel/Shared/PasswordHasher.php
+END
+TimeZone.php
+K 25
+svn:wc:ra_dav:version-url
+V 72
+/svn/mensa/!svn/ver/1/application/libraries/PHPExcel/Shared/TimeZone.php
+END
+CodePage.php
+K 25
+svn:wc:ra_dav:version-url
+V 72
+/svn/mensa/!svn/ver/1/application/libraries/PHPExcel/Shared/CodePage.php
+END
+File.php
+K 25
+svn:wc:ra_dav:version-url
+V 68
+/svn/mensa/!svn/ver/1/application/libraries/PHPExcel/Shared/File.php
+END
+OLERead.php
+K 25
+svn:wc:ra_dav:version-url
+V 71
+/svn/mensa/!svn/ver/1/application/libraries/PHPExcel/Shared/OLERead.php
+END
+Excel5.php
+K 25
+svn:wc:ra_dav:version-url
+V 70
+/svn/mensa/!svn/ver/1/application/libraries/PHPExcel/Shared/Excel5.php
+END
+Drawing.php
+K 25
+svn:wc:ra_dav:version-url
+V 71
+/svn/mensa/!svn/ver/1/application/libraries/PHPExcel/Shared/Drawing.php
+END
+Escher.php
+K 25
+svn:wc:ra_dav:version-url
+V 70
+/svn/mensa/!svn/ver/1/application/libraries/PHPExcel/Shared/Escher.php
+END
+ZipArchive.php
+K 25
+svn:wc:ra_dav:version-url
+V 74
+/svn/mensa/!svn/ver/1/application/libraries/PHPExcel/Shared/ZipArchive.php
+END
+OLE.php
+K 25
+svn:wc:ra_dav:version-url
+V 67
+/svn/mensa/!svn/ver/1/application/libraries/PHPExcel/Shared/OLE.php
+END
+XMLWriter.php
+K 25
+svn:wc:ra_dav:version-url
+V 73
+/svn/mensa/!svn/ver/1/application/libraries/PHPExcel/Shared/XMLWriter.php
+END
+Date.php
+K 25
+svn:wc:ra_dav:version-url
+V 68
+/svn/mensa/!svn/ver/1/application/libraries/PHPExcel/Shared/Date.php
+END
+Font.php
+K 25
+svn:wc:ra_dav:version-url
+V 68
+/svn/mensa/!svn/ver/1/application/libraries/PHPExcel/Shared/Font.php
+END
+String.php
+K 25
+svn:wc:ra_dav:version-url
+V 70
+/svn/mensa/!svn/ver/1/application/libraries/PHPExcel/Shared/String.php
+END
+ZipStreamWrapper.php
+K 25
+svn:wc:ra_dav:version-url
+V 80
+/svn/mensa/!svn/ver/1/application/libraries/PHPExcel/Shared/ZipStreamWrapper.php
+END

@@ -1,0 +1,10 @@
+IMAGE_NAME=mhc/cms
+IMAGE_TAG=php8.3
+CONTAINER_NAME=isos-mhc-sos-development
+CMS_SOURCE_PATH=/home/sos/src/mhc-sos
+DB_HOST=localhost
+DB_PORT=3306
+DB_USERNAME=root
+DB_PASSWORD=
+DB_NAME=sos_db
+DB_DRIVER=mysqli

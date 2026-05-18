@@ -1,0 +1,62 @@
+server {
+    listen  1880;
+    # server_name mysite.com www.mysite.com;
+
+    root   /home/app;
+    autoindex off;
+    index  index.php;
+
+    add_header Strict-Transport-Security "max-age=63072000; includeSubdomains; preload" always;
+    add_header X-Frame-Options "SAMEORIGIN" always;
+    add_header X-XSS-Protection "1; mode=block" always;
+    add_header X-Content-Type-Options "nosniff" always;
+    add_header Referrer-Policy "strict-origin-when-cross-origin" always;
+
+    # block sensitive directories and files
+    location ~ /\.git {
+        deny all;
+        return 403;
+    }
+    location ~ /\.env {
+        deny all;
+        return 403;
+    }
+    location = /adminer.php {
+        deny all;
+        return 403;
+    }
+    location = /config.php {
+        deny all;
+        return 403;
+    }
+    location = /sos_db.sql {
+        deny all;
+        return 403;
+    }
+
+    # set expiration of assets to MAX for caching
+    location ~* \.(ico|css|js|gif|jpe?g|png)$ {
+           expires max;
+           log_not_found off;
+    }
+
+    # main codeigniter rewrite rule
+    location / {
+        try_files $uri $uri/ /index.php?$query_string;
+    }
+
+    # php parsing
+     location ~ .php$ {
+        root          /home/app;
+        try_files $uri $uri/ /index.php?$query_string;
+        fastcgi_pass   unix:/var/run/php-fpm.sock;
+        # fastcgi_pass   127.0.0.1:9000;
+        fastcgi_index  index.php;
+        fastcgi_param  SCRIPT_FILENAME /home/app$fastcgi_script_name;
+        include       fastcgi_params;
+        fastcgi_buffer_size 128k;
+        fastcgi_buffers 256 4k;
+        fastcgi_busy_buffers_size 256k;
+        fastcgi_temp_file_write_size 256k;
+    }
+}

@@ -1,0 +1,47 @@
+K 25
+svn:wc:ra_dav:version-url
+V 64
+/svn/mensa/!svn/ver/1/application/libraries/PHPExcel/Shared/JAMA
+END
+QRDecomposition.php
+K 25
+svn:wc:ra_dav:version-url
+V 84
+/svn/mensa/!svn/ver/1/application/libraries/PHPExcel/Shared/JAMA/QRDecomposition.php
+END
+CholeskyDecomposition.php
+K 25
+svn:wc:ra_dav:version-url
+V 90
+/svn/mensa/!svn/ver/1/application/libraries/PHPExcel/Shared/JAMA/CholeskyDecomposition.php
+END
+CHANGELOG.TXT
+K 25
+svn:wc:ra_dav:version-url
+V 78
+/svn/mensa/!svn/ver/1/application/libraries/PHPExcel/Shared/JAMA/CHANGELOG.TXT
+END
+SingularValueDecomposition.php
+K 25
+svn:wc:ra_dav:version-url
+V 95
+/svn/mensa/!svn/ver/1/application/libraries/PHPExcel/Shared/JAMA/SingularValueDecomposition.php
+END
+LUDecomposition.php
+K 25
+svn:wc:ra_dav:version-url
+V 84
+/svn/mensa/!svn/ver/1/application/libraries/PHPExcel/Shared/JAMA/LUDecomposition.php
+END
+Matrix.php
+K 25
+svn:wc:ra_dav:version-url
+V 75
+/svn/mensa/!svn/ver/1/application/libraries/PHPExcel/Shared/JAMA/Matrix.php
+END
+EigenvalueDecomposition.php
+K 25
+svn:wc:ra_dav:version-url
+V 92
+/svn/mensa/!svn/ver/1/application/libraries/PHPExcel/Shared/JAMA/EigenvalueDecomposition.php
+END

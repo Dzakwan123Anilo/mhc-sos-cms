@@ -16,7 +16,10 @@ RUN docker-php-ext-configure gd --with-jpeg=/usr/include/ --with-freetype=/usr/i
     && docker-php-ext-install -j$(nproc) gd fileinfo dom mbstring zip pdo_mysql mysqli \
     && docker-php-source delete
 
-RUN apk add --no-cache nginx
+RUN apk add --no-cache nginx \
+    && mkdir -p /var/lib/nginx/tmp/client_body \
+    && chown -R www-data:www-data /var/lib/nginx/tmp \
+    && chmod -R 700 /var/lib/nginx/tmp
 
 # Install Composer from official source for latest version
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer

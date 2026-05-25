@@ -21,6 +21,20 @@ RUN apk add --no-cache nginx \
     && chown -R www-data:www-data /var/lib/nginx/tmp \
     && chmod -R 700 /var/lib/nginx/tmp
 
+RUN apk add --no-cache --virtual .build-deps \
+        gcc musl-dev make pcre-dev zlib-dev openssl-dev linux-headers \
+    && NGINX_VERSION=$(nginx -v 2>&1 | cut -d'/' -f2) \
+    && cd /tmp \
+    && wget -q https://nginx.org/download/nginx-${NGINX_VERSION}.tar.gz \
+    && tar xzf nginx-${NGINX_VERSION}.tar.gz \
+    && wget -qO- https://github.com/openresty/headers-more-nginx-module/archive/refs/tags/v0.37.tar.gz | tar xzf - \
+    && cd nginx-${NGINX_VERSION} \
+    && ./configure --with-compat --add-dynamic-module=../headers-more-nginx-module-0.37 \
+    && make modules \
+    && cp objs/ngx_http_headers_more_filter_module.so /usr/lib/nginx/modules/ \
+    && cd / && rm -rf /tmp/* \
+    && apk del .build-deps
+
 # Install Composer from official source for latest version
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 

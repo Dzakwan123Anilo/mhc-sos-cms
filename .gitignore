@@ -1,4 +1,5 @@
 sessions/*
+!sessions/.gitkeep
 assets/tmp-report/*
 assets/collections/*
 assets/assets

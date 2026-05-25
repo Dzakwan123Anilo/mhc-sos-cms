@@ -1,3 +1,5 @@
+load_module /usr/lib/nginx/modules/ngx_http_headers_more_filter_module.so;
+
 user  www-data;
 worker_processes  auto;
 
@@ -22,6 +24,7 @@ http {
 
     sendfile        on;
     server_tokens   off;
+    more_clear_headers 'Server';
     #tcp_nopush     on;
 
     keepalive_timeout  65;

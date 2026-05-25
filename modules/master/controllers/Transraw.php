@@ -227,9 +227,6 @@ class Transraw extends AdminController {
 		$return['data']['total'] = $data['total'];
 
 		//start..
-		error_reporting(E_ALL);
-		ini_set('display_errors', TRUE);
-		ini_set('display_startup_errors', TRUE);
 
 		require_once APPPATH.'libraries/PHPExcel.php';
 		require_once APPPATH.'libraries/PHPExcel/IOFactory.php';

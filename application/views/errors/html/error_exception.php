@@ -6,7 +6,10 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 
 <h4>An uncaught Exception was encountered</h4>
 
-<p>An internal error occurred. Please contact the administrator.</p>
+<p>Type: <?php echo get_class($exception); ?></p>
+<p>Message: <?php echo $message; ?></p>
+<p>Filename: <?php echo $exception->getFile(); ?></p>
+<p>Line Number: <?php echo $exception->getLine(); ?></p>
 
 <?php if (defined('SHOW_DEBUG_BACKTRACE') && SHOW_DEBUG_BACKTRACE === TRUE): ?>
 

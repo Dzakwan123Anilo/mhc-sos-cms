@@ -43,7 +43,7 @@ $config['encryption_key']   = getenv('ENCRYPTION_KEY') ?: 'b8Xk2Np7VmR5qLwYzT3An
 $config['activeLog']        = true;
 $config['activeChat']       = false;
 
-$config['base_url']         = "http://localhost:3004/";
+$config['base_url']         = getenv('APP_BASE_URL') ?: "http://localhost:3004/";
 //$config['base_url']         = "https://mhc.internationalsos.co.id/";
 //$config['domain']  = $_SERVER['SERVER_NAME'];
 //$config['domain']           = 'hondacbrcommunity.com';

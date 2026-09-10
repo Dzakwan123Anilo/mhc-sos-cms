@@ -35,7 +35,7 @@ class Me extends AdminController {
 		$m = $this->db->query("SELECT * FROM sos_provider ORDER BY provider_id ASC")->result();
 		foreach((array)$m as $k=>$v){
 			$username = "mhc".$v->provider_code;
-			$password = "123123";
+			$password = bin2hex(random_bytes(16));
 			$cek = $this->db->get_where("app_user",array("user_name" => $username))->num_rows();
 			if( $cek == 0 ){
 				$data = array(
@@ -1026,26 +1026,31 @@ class Me extends AdminController {
 				$user = $m1[0];
 				if(password_verify($old_pass, $user->user_password)){
 					$password_valid = true;
-				}elseif($user->user_password === md5($old_pass)){
-					$password_valid = true;
 				}
 			}
 
-			if($password_valid){
-				$pass_baru = password_hash(dbClean($_POST['new_pass']), PASSWORD_ARGON2ID);
-				$mx = $this->DATA->_update(
-					array(
-						"user_name"		=> $this->jCfg['user']['name']
-					),array(
-						"user_password" => $pass_baru
-					)
-
-				);
-				$pesan = ($mx)?"Success update your password":"Success update your password";
-				$mtype = ($mx)?"success":"error";
-			}else{
+			if(!$password_valid){
 				$pesan ="Your old password is not correctly!";
 				$mtype = "error";
+			}else{
+				$new_pass = dbClean($_POST['new_pass']);
+				$validation = validate_password_strength($new_pass);
+				if($validation !== true){
+					$pesan = $validation;
+					$mtype = "error";
+				}else{
+					$pass_baru = password_hash($new_pass, PASSWORD_ARGON2ID);
+					$mx = $this->DATA->_update(
+						array(
+							"user_name"		=> $this->jCfg['user']['name']
+						),array(
+							"user_password" => $pass_baru
+						)
+
+					);
+					$pesan = ($mx)?"Success update your password":"Success update your password";
+					$mtype = ($mx)?"success":"error";
+				}
 			}
 
 			redirect($this->own_link."/change_password?msg=".urldecode($pesan)."&type_msg=".$mtype);
@@ -1096,6 +1101,4 @@ class Me extends AdminController {
     $this->_v("welcome", array());
   }
 }
-
-
 

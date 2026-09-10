@@ -36,7 +36,7 @@ class Me extends AdminController {
 		$m = $this->db->query("SELECT * FROM sos_provider ORDER BY provider_id ASC")->result();
 		foreach((array)$m as $k=>$v){
 			$username = "mhc".$v->provider_code;
-			$password = "123123";
+			$password = bin2hex(random_bytes(16));
 			$cek = $this->db->get_where("app_user",array("user_name" => $username))->num_rows();
 			if( $cek == 0 ){
 				$data = array(
@@ -1022,15 +1022,14 @@ class Me extends AdminController {
 		$this->is_dashboard = TRUE;
 		$pesan="";
 		if(isset($_POST['btn_simpan'])){
-			$pass_lama = md5(dbClean($_POST['old_pass']));
 			$this->DATA->table="app_user";
 			$m1 = $this->DATA->_getall(array(
-				"user_name"		=> $this->jCfg['user']['name'],
-				"user_password"	=> $pass_lama
+				"user_name"		=> $this->jCfg['user']['name']
 			));
 
-			if(count($m1)>0){
-				$pass_baru = md5(dbClean($_POST['new_pass']));
+			$password_valid = count($m1) > 0 && password_verify(dbClean($_POST['old_pass']), $m1[0]->user_password);
+			if($password_valid){
+				$pass_baru = password_hash(dbClean($_POST['new_pass']), PASSWORD_ARGON2ID);
 				$mx = $this->DATA->_update(
 					array(
 						"user_name"		=> $this->jCfg['user']['name']
@@ -1090,6 +1089,3 @@ class Me extends AdminController {
 		}
 	}
 }
-
-
-

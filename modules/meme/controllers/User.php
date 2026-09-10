@@ -192,7 +192,11 @@ class User extends AdminController {
 		
 
 		if( isset($_POST['user_password']) && trim($_POST['user_password']) != ''){
-			$data['user_password'] = password_hash(dbClean($_POST['user_password']), PASSWORD_ARGON2ID);
+			$raw_pass = dbClean($_POST['user_password']);
+			$validation = validate_password_strength($raw_pass);
+			if($validation === true){
+				$data['user_password'] = password_hash($raw_pass, PASSWORD_ARGON2ID);
+			}
 		}
 		
 		$a = $this->_save_master( 

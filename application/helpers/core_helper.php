@@ -365,8 +365,11 @@ function _ac($c='index'){
 function get_info_message(){
 
 	 if( isset($_GET['msg']) ){ 
-	 		$type= isset($_GET['type_msg'])?$_GET['type_msg']:'info';
-	 		$msg= isset($_GET['msg'])?$_GET['msg']:'info';
+	 		$allowed_types = array('success', 'info', 'warning', 'danger', 'error');
+	 		$type = isset($_GET['type_msg']) && in_array($_GET['type_msg'], $allowed_types)
+	 			? $_GET['type_msg']
+	 			: 'info';
+	 		$msg = isset($_GET['msg']) ? $_GET['msg'] : '';
 	 	?>
 	 	<style type="text/css">
 	 	#alert_top{
@@ -386,7 +389,7 @@ function get_info_message(){
 	 	<div class="alert alert-<?php echo $type;?>" id="alert_top">
 		    <button data-dismiss="alert" class="close"></button>
 		    <span class="semi-bold"><b>Pesan</b></span> <br />
-		    <?php echo urldecode($_GET['msg']);?>
+		    <?php echo htmlspecialchars(urldecode($msg), ENT_QUOTES, 'UTF-8');?>
 		</div>
 		
 		<script type="text/javascript">
@@ -396,6 +399,28 @@ function get_info_message(){
 		setTimeout('hidden_msg()',4000);
 		</script>
 	<?php } 
+}
+
+function validate_password_strength($password) {
+	if (strlen($password) < 8) {
+		return 'Password minimal 8 karakter';
+	}
+	if (strlen($password) > 32) {
+		return 'Password maksimal 32 karakter';
+	}
+	if (!preg_match('/[A-Z]/', $password)) {
+		return 'Password harus mengandung huruf kapital';
+	}
+	if (!preg_match('/[a-z]/', $password)) {
+		return 'Password harus mengandung huruf kecil';
+	}
+	if (!preg_match('/[0-9]/', $password)) {
+		return 'Password harus mengandung angka';
+	}
+	if (!preg_match('/[^a-zA-Z0-9]/', $password)) {
+		return 'Password harus mengandung karakter spesial';
+	}
+	return true;
 }
 
 function _encrypt($data = ""){
@@ -1325,4 +1350,3 @@ function get_role_name($role_id=""){
 	$m = $CI->db->get("app_acl_group")->row();
 	return isset($m->ag_group_name)?$m->ag_group_name:'';
 }
-

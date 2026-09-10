@@ -181,7 +181,17 @@ class Import_member extends AdminController {
 		
         //  Loop through each row of the worksheet in turn
         for ($row = 2; $row <= $highestRow; $row++){ 
-            $birthdate = date('Y-m-d', strtotime($sheet->getCellByColumnAndRow(5,$row)->getFormattedValue()));
+            $birthdate_cell = $sheet->getCellByColumnAndRow(5, $row);
+            $birthdate_value = $birthdate_cell->getValue();
+//echo $birthdate_value;
+//exit;
+            if (is_numeric($birthdate_value) && PHPExcel_Shared_Date::isDateTime($birthdate_cell)) {
+                // $birthdate = PHPExcel_Shared_Date::ExcelToPHPObject($birthdate_value)->format('Y-m-d');
+                $birthdate = gmdate('Y-m-d', PHPExcel_Shared_Date::ExcelToPHP((float) $birthdate_value));
+            } else {
+                $birthdate_timestamp = strtotime(trim($birthdate_cell->getFormattedValue()));
+                $birthdate = $birthdate_timestamp === false ? '' : date('Y-m-d', $birthdate_timestamp);
+            }
 
 			if($sheet->getCellByColumnAndRow(0,$row)->getValue()!='') {
 	            $rowData[] = array(
@@ -281,4 +291,3 @@ class Import_member extends AdminController {
     }
 
 }
-

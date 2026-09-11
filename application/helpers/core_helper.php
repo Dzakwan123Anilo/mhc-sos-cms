@@ -405,9 +405,6 @@ function validate_password_strength($password) {
 	if (strlen($password) < 8) {
 		return 'Password minimal 8 karakter';
 	}
-	if (strlen($password) > 32) {
-		return 'Password maksimal 32 karakter';
-	}
 	if (!preg_match('/[A-Z]/', $password)) {
 		return 'Password harus mengandung huruf kapital';
 	}
@@ -1350,3 +1347,4 @@ function get_role_name($role_id=""){
 	$m = $CI->db->get("app_acl_group")->row();
 	return isset($m->ag_group_name)?$m->ag_group_name:'';
 }
+

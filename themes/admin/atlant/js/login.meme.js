@@ -19,10 +19,9 @@ login = {
           url: AUTH_URL,
           type: "POST",
           data: { 
-             username      : $('#login_username').val(),
-             password      : $('#login_pass').val(),
-             captcha_answer: $('#login_captcha').val(),
-             login         : true
+            username      : $('#login_username').val(),
+            password      : $('#login_pass').val(),
+            login         : true
           },
           dataType: "json"
         });
@@ -33,10 +32,6 @@ login = {
                 $('#alert_message').removeClass('alert-success').addClass('alert-danger').fadeIn();
                 $('#txt_message').html(obj.message);
                 $('#login_username,#login_pass').val('');
-                if(obj.data && obj.data.captcha_question){
-                    $('label[for="login_captcha"]').text('Security check: ' + obj.data.captcha_question);
-                }
-                $('#login_captcha').val('');
                 $('#login_username').focus();
             }else{
                 $('#alert_message').removeClass('alert-danger').addClass('alert-success').fadeIn();

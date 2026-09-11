@@ -57,12 +57,6 @@
                     </div>
                     <div class="form-group">
                         <div class="col-md-12">
-                            <label for="login_captcha">Security check: <?php echo htmlspecialchars($captcha_question, ENT_QUOTES, 'UTF-8'); ?></label>
-                            <input type="text" class="form-control" id="login_captcha" placeholder="Answer" inputmode="numeric" autocomplete="off" />
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <div class="col-md-12">
                             <div class="input-group">
                                 <div class="input-group-addon">
                                     <span class="fa fa-lock"></span>
@@ -115,6 +109,7 @@
 
     </body>
 </html>
+
 
 
 

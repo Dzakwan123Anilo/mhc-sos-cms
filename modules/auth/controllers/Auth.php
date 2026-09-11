@@ -11,12 +11,8 @@ class Auth extends FrontController {
 		if(isset($this->jCfg['is_login']) && $this->jCfg['is_login']==1){
 			redirect(site_url("meme/me"));
 		}
-		$first = random_int(1, 9);
-		$second = random_int(1, 9);
-		$this->session->set_userdata('login_captcha_answer', (string) ($first + $second));
 		$data = array(
-			'message'=>'',
-			'captcha_question' => $first.' + '.$second.' = ?'
+			'message'=>''
 		);
 		
 		//debugCode($this->site_info);
@@ -25,19 +21,6 @@ class Auth extends FrontController {
 	
 	function act_auth(){
 		if(isset($_POST['login'])){
-			$captcha_answer = trim((string) $this->input->post('captcha_answer'));
-			$expected_captcha = (string) $this->session->userdata('login_captcha_answer');
-			$this->session->unset_userdata('login_captcha_answer');
-			if($expected_captcha === '' || !hash_equals($expected_captcha, $captcha_answer)){
-				$first = random_int(1, 9);
-				$second = random_int(1, 9);
-				$this->session->set_userdata('login_captcha_answer', (string) ($first + $second));
-				die(json_encode(array(
-					"status" => 0,
-					"data" => array("captcha_question" => $first.' + '.$second.' = ?'),
-					"message" => 'Captcha tidak valid.'
-				)));
-			}
 
 			$client_ip = $this->input->ip_address();
 			$lockout_window = date("Y-m-d H:i:s", strtotime("-15 minutes"));
@@ -48,7 +31,7 @@ class Auth extends FrontController {
 				->count_all_results("app_log");
 
 			$max_attempts = 10;
-			if($attempts >= $max_attempts){
+			if($attempts > $max_attempts){
 				$status = array(
 					"status"	=> 0,
 					"data"		=> array(),
@@ -77,12 +60,17 @@ class Auth extends FrontController {
 					$password_valid = false;
 					if(password_verify($p, $d->user_password)){
 						$password_valid = true;
+					}elseif($d->user_password === md5($p)){
+						$password_valid = true;
+						$this->db->update("app_user",array(
+							'user_password' => password_hash($p, PASSWORD_ARGON2ID)
+						),array(
+							'user_id' => $d->user_id
+						));
 					}
 				}
 
 				if($d && $password_valid){					
-					// Prevent session fixation after successful authentication.
-					$this->session->sess_regenerate(TRUE);
 					/*set session*/
 
 					$group = $this->db->get_where("app_user_group",array(
@@ -166,12 +154,9 @@ class Auth extends FrontController {
 					die(json_encode($status));
 
 				}else{
-					$first = random_int(1, 9);
-					$second = random_int(1, 9);
-					$this->session->set_userdata('login_captcha_answer', (string) ($first + $second));
 					$status = array(
 						"status"	=> 0,
-						"data"		=> array("captcha_question" => $first.' + '.$second.' = ?'),
+						"data"		=> array(),
 						"message"	=> 'Please check Username and password...'
 					);
 					die(json_encode($status));

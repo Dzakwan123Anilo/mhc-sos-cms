@@ -22,6 +22,8 @@ class Inpatient_summary extends AdminController {
 			'plugins/bootstrap/bootstrap-file-input.js',
 			'plugins/bootstrap/bootstrap-select.js',
 			'plugins/tagsinput/jquery.tagsinput.js',
+			'ckeditor/ckeditor.js',
+			'ckeditor/adapters/jquery.js'
 		);
 	}
 	
@@ -58,3 +60,4 @@ class Inpatient_summary extends AdminController {
 	}
 
 }
+

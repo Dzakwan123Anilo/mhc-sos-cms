@@ -4435,52 +4435,6 @@ td.dataTables_empty {
   font-size: 21px;
   border-color: #D5D5D5;
 }
-.login-container.login-v2 .login-box .login-body .login-captcha {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  width: 100%;
-}
-.login-container.login-v2 .login-box .login-body .login-captcha-preview {
-  display: flex;
-  align-items: stretch;
-  gap: 8px;
-  width: 100%;
-}
-.login-container.login-v2 .login-box .login-body .login-captcha-image-frame {
-  display: flex;
-  flex: 1 1 auto;
-  align-items: center;
-  justify-content: center;
-  min-width: 0;
-  height: 58px;
-  overflow: hidden;
-  background: #F5F7FA;
-  border: 1px solid #D5D5D5;
-  border-radius: 4px;
-}
-.login-container.login-v2 .login-box .login-body .login-captcha-image-frame img {
-  display: block;
-  width: 180px;
-  max-width: 100%;
-  height: 56px;
-  object-fit: contain;
-}
-.login-container.login-v2 .login-box .login-body .login-captcha-preview .btn {
-  display: flex;
-  flex: 0 0 48px;
-  align-items: center;
-  justify-content: center;
-  width: 48px;
-  height: 58px;
-  padding: 0;
-  border-radius: 4px;
-}
-.login-container.login-v2 .login-box .login-body .login-captcha > .form-control {
-  width: 100%;
-  border-left: 1px solid #D5D5D5;
-  border-radius: 4px;
-}
 .login-container.login-v2 .login-box .login-body a {
   color: #2C366F;
 }

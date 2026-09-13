@@ -43,7 +43,7 @@ IMPORT_MEMBER = {
        if (typeof ID != "undefined") {
 
             $('#tr_item_info_'+ID).fadeIn("medium",function(){
-              $('#msg_item_'+ID).text('Loading..');
+              $('#msg_item_'+ID).html('Loading..');
               $('#tr_item_'+ID).css('opacity','0.3');
             });
 
@@ -69,16 +69,16 @@ IMPORT_MEMBER = {
                 import_id:IMPORT_ID
             };
             $.post(AJAX_URL_IMPORT,parData,function(res){
-                var obj = (res && typeof res === 'object') ? res : JSON.parse(res);
+                obj = eval('('+res+')');
                 if( obj.status == 1 ){
                   SUKSES++;
-                  $('#count_success').text(SUKSES);
-                  $('#msg_item_'+ID).css('color', 'green').text(MEME.textValue(obj.message));
+                  $('#count_success').html(SUKSES);
+                  $('#msg_item_'+ID).html("<span style='color:green;'>"+obj.message+"</span>");
                 }
                 if( obj.status == 0 ){
                   GAGAL++;
-                  $('#count_gagal').text(GAGAL);
-                  $('#msg_item_'+ID).css('color', 'red').text(MEME.textValue(obj.message));
+                  $('#count_gagal').html(GAGAL);
+                  $('#msg_item_'+ID).html("<span style='color:red;'>"+obj.message+"</span>");
                   
                 }
                 
@@ -94,12 +94,10 @@ IMPORT_MEMBER = {
     },
     btnOnLoading: function(obj,status){
         if( status=='START' ){
-            $('#btn_approve').removeClass('btn-warning').text('silahkan tunggu!, Loading....');
+            $('#btn_approve').removeClass('btn-warning').html('silahkan tunggu!, Loading....');
         }
         if( status=='SELESAI'){
-            $('#btn_approve').addClass('btn-warning').empty()
-              .append($('<i>').addClass('fa fa-check'))
-              .append(document.createTextNode(' Approve'));
+            $('#btn_approve').addClass('btn-warning').html('<i class="fa fa-check"></i> Approve');
         }
     }
 }

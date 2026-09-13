@@ -75,37 +75,6 @@ class MY_Controller extends CI_Controller{
 			redirect('auth');
 		}
 	}
-
-	protected function _safe_internal_url($url, $fallback = ''){
-		$fallback = $fallback !== '' ? $fallback : site_url();
-		$url = trim((string)$url);
-		if($url === '' || preg_match('/[\x00-\x1F\x7F\\\\]/', $url)){
-			return $fallback;
-		}
-
-		if(substr($url, 0, 1) === '/' && substr($url, 0, 2) !== '//'){
-			return $url;
-		}
-
-		$target = parse_url($url);
-		$base = parse_url(base_url());
-		if(!is_array($target) || !is_array($base) || empty($target['scheme']) || empty($target['host'])){
-			return $fallback;
-		}
-		if(isset($target['user']) || isset($target['pass'])){
-			return $fallback;
-		}
-
-		$target_port = isset($target['port']) ? (int)$target['port'] : (strtolower($target['scheme']) === 'https' ? 443 : 80);
-		$base_port = isset($base['port']) ? (int)$base['port'] : (strtolower($base['scheme']) === 'https' ? 443 : 80);
-		if(strtolower($target['scheme']) !== strtolower($base['scheme']) ||
-			strtolower($target['host']) !== strtolower($base['host']) ||
-			$target_port !== $base_port){
-			return $fallback;
-		}
-
-		return $url;
-	}
 	
 	function current_session($i=0){
 		for($x=0;$x>=$i;$x++){
@@ -478,11 +447,11 @@ class MY_Controller extends CI_Controller{
 		
 		$class 	= $this->_getClass();
 		$method	= $this->_getMethod();
-		$name	= isset($this->jCfg['user'])?$this->jCfg['user']['name']:'';
-		$id 	= isset($this->jCfg['user'])?$this->jCfg['user']['id']:0;
-		$ip		= $this->input->ip_address();
-		$browser= substr((string)($_SERVER['HTTP_USER_AGENT'] ?? ''), 0, 255);
-		$url 	= substr((string)($_SERVER['HTTP_HOST'] ?? '').(string)($_SERVER['REQUEST_URI'] ?? ''), 0, 255);
+		$name	= isset($this->jCfg['user'])?$this->jCfg['user']['name']:'none';
+		$id 	= isset($this->jCfg['user'])?$this->jCfg['user']['id']:'none';
+		$ip		= $_SERVER['REMOTE_ADDR'];
+		$browser= $_SERVER['HTTP_USER_AGENT'];
+		$url 	= $_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI'];
 		
 		$flag_ins = TRUE;
 		if( (!isset($this->jCfg['current_class'])) && (!isset($this->jCfg['current_funtion'])) ){
@@ -503,13 +472,7 @@ class MY_Controller extends CI_Controller{
 		$curr_class = isset($this->jCfg['current_class'])?$this->jCfg['current_class']:'';
 		if(!empty($id) && $flag_ins==TRUE && $curr_class !="chat" ){
 			
-			$post_data = isset($_POST) ? $_POST : array();
-			array_walk_recursive($post_data, function(&$value, $key){
-				if(preg_match('/pass(word)?|token|secret|captcha|csrf/i', (string)$key)){
-					$value = '[REDACTED]';
-				}
-			});
-			$POST=json_encode($post_data);
+			$POST=isset($_POST)?json_encode($_POST):"";
 			$GET=isset($_GET)?json_encode($_GET):"";
 			$arr_method = array(
 				"detail_member","detail_advertiser","cek_advertiser_username",

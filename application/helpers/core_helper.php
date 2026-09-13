@@ -187,10 +187,10 @@ function get_new_image($p=array(),$absolute_path=false){
 	$p['url_site'] = !isset($p['url_site'])?$p['url']:$p['url_site'];
 	//$p['url'] = isset($p['site_id'])&&trim($p['site_id'])!="1"?$p['url_site']:$p['url'];
 
-	$no_image = base_url()."assets/images/profile-kosong1_40_40.png";
+	$no_image = base_url()."assets/collections/no_image.jpg";
 	$return = $no_image;
 	
-	$url_source_no_image = $no_image;
+	$url_source_no_image = base_url()."assets/images/no_image.jpg";
 	$p['url'] = trim($p['url'])==""?$url_source_no_image:$p['url'];
 	
 	if( trim($p['url']) != ""){
@@ -266,7 +266,7 @@ function get_new_image($p=array(),$absolute_path=false){
 					if(!$CI->image_lib->resize()){
 							//debugCode($this->image_lib->display_errors());
 							//echo "eror resize ".$new_image_name;
-							$return = $no_image;
+							$return = base_url()."assets/images/no_image.jpg";
 					}
 					$CI->image_lib->clear();
 					
@@ -300,7 +300,7 @@ function get_new_image($p=array(),$absolute_path=false){
 					if(!$CI->image_lib->resize()){
 							//debugCode($this->image_lib->display_errors());
 							//echo "eror resize ".$new_image_name;
-							$return = $no_image;
+							$return = base_url()."assets/images/no_image.jpg";
 					}
 					$CI->image_lib->clear();
 				}	
@@ -330,7 +330,7 @@ function get_new_image($p=array(),$absolute_path=false){
 
 function get_image($url="",$noimage=""){
 	if(trim($noimage)==""){
-		$no_image = base_url()."assets/images/profile-kosong1_40_40.png";
+		$no_image = base_url()."assets/images/no_image.jpg";
 	}else{
 		$no_image = themeUrl()."images/".$noimage;
 	}
@@ -396,21 +396,14 @@ function get_info_message(){
 		function hidden_msg(){
 			$('#alert_top').fadeOut();
 		}
-		setTimeout(hidden_msg, 4000);
+		setTimeout('hidden_msg()',4000);
 		</script>
 	<?php } 
 }
 
 function validate_password_strength($password) {
-	$min_length = max(8, (int)cfg('password_min_length'));
-	$max_length = max($min_length, (int)cfg('password_max_length'));
-	$length = strlen((string)$password);
-
-	if ($length < $min_length) {
-		return 'Password minimal '.$min_length.' karakter';
-	}
-	if ($length > $max_length) {
-		return 'Password maksimal '.$max_length.' karakter';
+	if (strlen($password) < 8) {
+		return 'Password minimal 8 karakter';
 	}
 	if (!preg_match('/[A-Z]/', $password)) {
 		return 'Password harus mengandung huruf kapital';
@@ -679,6 +672,13 @@ function _dt($dt="30/01/2014"){
 	$t = date("m", strtotime($tmp[1]));
 	return $tmp[2]."-".$t."-".$tmp[0];
 }
+function js_hight_chart(){	
+	?>
+		<script src="<?php echo base_url();?>assets/js/cart/js/highcharts.js" type="text/javascript"></script>
+		<script src="<?php echo base_url();?>assets/js/cart/js/modules/exporting.js" type="text/javascript"></script>
+	<?php
+}
+
 function js_picker(){	
 	?>
 	<link href="<?php echo themeUrl();?>assets/plugins/bootstrap-datepicker/css/datepicker.css" rel="stylesheet" type="text/css" />
@@ -1347,3 +1347,4 @@ function get_role_name($role_id=""){
 	$m = $CI->db->get("app_acl_group")->row();
 	return isset($m->ag_group_name)?$m->ag_group_name:'';
 }
+

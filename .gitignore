@@ -5,6 +5,3 @@ assets/collections/*
 assets/assets
 .DS_Store
 .serena/
-deploy/.variables
-graphify-out/
-VUNWEBEXT_*.xlsx

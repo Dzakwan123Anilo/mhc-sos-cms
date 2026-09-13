@@ -1,45 +1,68 @@
 BENEFIT = {
-	init: function(){
-		$('#benefit_clientid').change(function(){
-			var clientId = $(this).val();
-			$.post(GET_SERVICE_TYPE, {id: clientId}, function(response){
-				var data = (response && typeof response === 'object') ? response : JSON.parse(response);
-				BENEFIT.fillServiceType(data.st);
-			});
-			$.post(GET_PLANT_TYPE, {id: clientId}, function(response){
-				var data = (response && typeof response === 'object') ? response : JSON.parse(response);
-				BENEFIT.fillPlanType(data.pt);
-			});
+    init: function(){ 
+		$( 'textarea#wysiwg_full' ).ckeditor({
+			filebrowserUploadUrl: '/upload_ckeditor.php'
 		});
+		
+		$("#benefit_clientid").change(function(){
+		    $.post(GET_SERVICE_TYPE,{id:$(this).val()},function(o){
+			    obj = eval('('+o+')');
+			    BENEFIT.fillServiceType(obj.st);
+		    });
 
-		if(STID !== ''){
-			$.post(GET_SERVICE_TYPE, {id: CID}, function(response){
-				var data = (response && typeof response === 'object') ? response : JSON.parse(response);
-				BENEFIT.fillServiceType(data.st, STID);
-			});
+		    $.post(GET_PLANT_TYPE,{id:$(this).val()},function(o){
+			    obj = eval('('+o+')');
+			    BENEFIT.fillPlanType(obj.pt);
+		    });
+	    });
+		
+		if(STID != '') {
+			$.post(GET_SERVICE_TYPE,{id:CID},function(o){
+			    obj = eval('('+o+')');
+			    BENEFIT.fillServiceType(obj.st,STID);
+		    });
 		}
-		if(PTID !== ''){
-			$.post(GET_PLANT_TYPE, {id: CID}, function(response){
-				var data = (response && typeof response === 'object') ? response : JSON.parse(response);
-				BENEFIT.fillPlanType(data.pt, PTID);
-			});
+		
+		if(PTID != '') {
+			$.post(GET_PLANT_TYPE,{id:CID},function(o){
+			    obj = eval('('+o+')');
+			    BENEFIT.fillPlanType(obj.pt,PTID);
+		    });
 		}
+    },
+    fillServiceType: function(obj,sid) { 
+    	ap=$('#benefit_serviceid');
+    	
+    	ap.empty();
+    	html = '<option value=""> - pilih tipe pelayanan - </option>';
+	    if(obj.length > 0){
+		    
+	    	$.each(obj,function(k,v){
+	    		var s = sid==v.service_id?' selected="selected"':'';
+				html += '<option value="'+v.service_id+'"'+s+'>'+v.service_type+'</option>';			 
+	    	});	    	
+	    	
+	    }
+    	ap.append(html);
+    	ap.selectpicker('refresh');
 	},
-	fillServiceType: function(items, selectedId){
-		var select = $('#benefit_serviceid');
-		MEME.fillSelect(select, items, '- pilih tipe pelayanan -', 'service_id', function(item){
-			return item.service_type;
-		}, selectedId);
-		select.selectpicker('refresh');
-	},
-	fillPlanType: function(items, selectedId){
-		var select = $('#benefit_planid');
-		MEME.fillSelect(select, items, '- pilih kelas perawatan -', 'plan_id', function(item){
-			return '[ ' + MEME.textValue(item.plan_type) + ' ] ' + MEME.textValue(item.plan_description);
-		}, selectedId);
-		select.selectpicker('refresh');
+    fillPlanType: function(obj,sid) { 
+    	ap=$('#benefit_planid');
+    	
+    	ap.empty();
+    	html = '<option value=""> - pilih kelas perawatan - </option>';
+	    if(obj.length > 0){
+		    
+	    	$.each(obj,function(k,v){
+	    		var s = sid==v.plan_id?' selected="selected"':'';
+				html += '<option value="'+v.plan_id+'"'+s+'>[ '+v.plan_type+' ] '+v.plan_description+'</option>';				 
+	    	});	    	
+	    	
+	    }
+    	ap.append(html);
+    	ap.selectpicker('refresh');
 	}
-};
+}
 
 $(document).ready(function(){
 	BENEFIT.init();

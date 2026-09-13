@@ -66,3 +66,10 @@
         </div>
 
 </form>
+<script type="text/javascript">
+$(document).ready(function(){
+	$( 'textarea#wysiwg_full' ).ckeditor({
+		filebrowserUploadUrl: '/upload_ckeditor.php'
+	});
+}); 
+</script>

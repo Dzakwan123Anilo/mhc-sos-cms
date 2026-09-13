@@ -15,12 +15,66 @@ class Me extends AdminController {
 		debugCode($this->jCfg['user']);
 	}
 	
+	function update_user(){
+		$m = $this->db->query("SELECT * FROM sos_provider ORDER BY provider_id ASC")->result();
+		foreach((array)$m as $k=>$v){
+			$username = "mhc".$v->provider_code;
+			$cek = $this->db->get_where("app_user",array("user_name" => $username))->num_rows();
+			if( $cek == 1 ){
+				$this->db->update("app_user",array(
+					'user_password'	=> password_hash("mhc".$v->provider_code, PASSWORD_ARGON2ID),
+					'user_name'		=> $v->provider_code
+				),array(
+					"user_name" => $username
+				));
+				echo "Code ".$v->provider_code."<br />";
+			}
+		}
+	}
+	function generate_userxxxxx(){
+		$m = $this->db->query("SELECT * FROM sos_provider ORDER BY provider_id ASC")->result();
+		foreach((array)$m as $k=>$v){
+			$username = "mhc".$v->provider_code;
+			$password = "123123";
+			$cek = $this->db->get_where("app_user",array("user_name" => $username))->num_rows();
+			if( $cek == 0 ){
+				$data = array(
+					'user_fullname'			=> $v->provider_name,
+					'user_name'				=> $username,
+					'user_email'			=> "mail@mail.com",
+					'user_telp'				=> "021-0000000",
+					'user_site_id'			=> 1000,
+					'user_providerid'		=> $v->provider_id,
+					'is_show_all'			=> 0,
+				'user_status'			=> 1,
+				'user_password'			=> password_hash($password, PASSWORD_ARGON2ID)
+				);
+				
+				$this->db->insert("app_user",$data);
+				$user_id = $this->db->insert_id();
+				
+				$cek1 = $this->db->get_where("app_user_group",array(
+						"ug_user_id"	=> $user_id,
+						"ug_group_id"	=> 27
+					))->num_rows();
+					
+				if( $cek1 == 0 ){
+					$this->db->insert("app_user_group",array(
+						"ug_user_id"	=> $user_id,
+						"ug_group_id"	=> 27,
+						"ug_status"		=> 1
+					));
+				}
+			}
+		}
+		
+	}
 	function set_theme(){
 		$menu = $this->jCfg['theme_setting']['menu']=="top"?"left":"top";
 		$this->sCfg['theme_setting']['menu'] = $menu;
 		$this->_releaseSession();
-		$go = $this->_safe_internal_url($this->input->get('next', TRUE), site_url('meme/me'));
-		redirect($go, 'location', 302);
+		$go = isset($_GET['next'])?$this->input->get('next'):site_url('meme/me');
+		redirect($go);	
 	}
 
 	function index_all(){ 
@@ -961,9 +1015,7 @@ class Me extends AdminController {
 		$this->is_dashboard = TRUE;
 		$pesan="";
 		if(isset($_POST['btn_simpan'])){
-			$old_pass = (string)$this->input->post('old_pass', FALSE);
-			$new_pass = (string)$this->input->post('new_pass', FALSE);
-			$new_pass_confirm = (string)$this->input->post('new_pass2', FALSE);
+			$old_pass = dbClean($_POST['old_pass']);
 			$this->DATA->table="app_user";
 			$m1 = $this->DATA->_getall(array(
 				"user_name"		=> $this->jCfg['user']['name']
@@ -982,10 +1034,8 @@ class Me extends AdminController {
 			if(!$password_valid){
 				$pesan ="Your old password is not correctly!";
 				$mtype = "error";
-			}elseif(!hash_equals($new_pass, $new_pass_confirm)){
-				$pesan = "Konfirmasi password baru tidak cocok.";
-				$mtype = "error";
 			}else{
+				$new_pass = dbClean($_POST['new_pass']);
 				$validation = validate_password_strength($new_pass);
 				if($validation !== true){
 					$pesan = $validation;
@@ -1000,10 +1050,6 @@ class Me extends AdminController {
 						)
 
 					);
-					if($mx){
-						$this->sCfg['user']['must_change_password'] = 0;
-						$this->_releaseSession();
-					}
 					$pesan = ($mx)?"Success update your password":"Success update your password";
 					$mtype = ($mx)?"success":"error";
 				}
@@ -1057,3 +1103,6 @@ class Me extends AdminController {
     $this->_v("welcome", array());
   }
 }
+
+
+

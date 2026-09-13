@@ -1,53 +1,60 @@
 CLIENT = {
-	init: function(){},
-	_showData: function(id, offset){
-		$('#list-provider').empty().append($('<tr>').append($('<td>', {colspan: 3}).text('loading...')));
-		$.post(URL_GET_DATA_PROVIDER, {id: id, offset: offset}, function(response){
-			var data = (response && typeof response === 'object') ? response : JSON.parse(response);
-			CLIENT._clearDetail();
-			CLIENT.renderProviders(data.provider, offset);
-			$('#btn-previous, #btn-next').removeAttr('disabled');
-			$('#p-offset').val(parseInt(offset, 10) - 5);
-			$('#n-offset').val(parseInt(offset, 10) + 5);
-			if($('#p-offset').val() < 0){
-				$('#btn-previous').attr('disabled', 'disabled');
-			}
-			if($('#n-offset').val() > data.max){
-				$('#btn-next').attr('disabled', 'disabled');
-			}
-		});
-	},
-	renderProviders: function(providers, offset){
-		var table = $('#list-provider').empty();
-		if(!providers || providers.length === 0){
-			table.append($('<tr>').append($('<td>', {colspan: 3}).text('Data tidak ditemukan')));
-			return;
-		}
-		var start = parseInt(offset, 10) || 0;
-		$.each(providers, function(index, provider){
-			var providerId = MEME.textValue(provider.provider_id);
-			var row = MEME.appendTextRow(table, [
-				start + index + 1,
-				provider.provider_name,
-				provider.provider_description
-			]);
-			row.attr('id', 'tr-detail-' + providerId).css('cursor', 'pointer').on('click', function(){
-				CLIENT._showDetail(providerId);
-			});
-		});
-	},
-	_showDetail: function(id){
-		CLIENT._clearDetail();
-		var cells = $('#tr-detail-' + id).find('td');
-		$('.panel-detail').css('opacity', '1');
-		$('#provider-name').text(cells.eq(1).text());
-		$('#provider-description').text(cells.eq(2).text());
-	},
-	_clearDetail: function(){
-		$('.panel-detail').css('opacity', '0.5');
-		$('#provider-name,#provider-description').text('');
-	}
-};
+    init: function(){        
+    },
+    _showData: function(id,offset){
+	    $('#list-provider').html('<tr><td colspan="3">loading...</td></tr>');
+	    $.post(URL_GET_DATA_PROVIDER,{id:id,offset:offset},function(o){
+		    obj = eval('('+o+')');
+		    CLIENT._clearDetail;
+		    CLIENT.htmlProvider(obj.provider,offset);
+		    $('#btn-previous, #btn-next').removeAttr('disabled');
+		    $('#p-offset').val(parseInt(offset)-5);		    
+		    $('#n-offset').val(parseInt(offset)+5);
+		    if($('#p-offset').val()<0) $('#btn-previous').attr('disabled','disabled');
+		    if($('#n-offset').val()>obj.max) $('#btn-next').attr('disabled','disabled'); 
+	    });
+    },
+    htmlProvider: function(obj,offset){
+    	html = '';ap=$('#list-provider');
+    	ap.html('');
+	    if(obj.length > 0){
+		    
+		    no=offset>0?offset:0;
+	    	$.each(obj,function(k,v){
+	    		 no++;
+		    	 html ='<tr id="tr-detail-'+v.provider_id+'" style="cursor:pointer;" onclick="CLIENT._showDetail('+v.provider_id+')">';
+			     html +='<td>'+no+'</td>';
+			     html +='<td>'+v.provider_name+'</td>';
+			     html +='<td>'+v.provider_description+'</td>';
+				 html += '</tr>';
+				 
+				 ap.append(html);
+	    	});
+	    	
+	    	
+	    }else{
+		     ap.html('<tr><td colspan="3">Data tidak ditemukan</td></tr>');
+	    }
+    },
+    _showDetail: function(id){
+    	CLIENT._clearDetail();
+    	ap = $('#tr-detail-'+id);
+    	$('.panel-detail').css('opacity','1');
+    	
+        var id = ['','provider-name','provider-description'], i = 0;
+        ap.find("td").each(function(){
+           if(i==1) $('#'+id[i]).html($(this).html());
+           if(i==2) $('#'+id[i]).html($(this).html());
+            i++;
+        });
+    },
+    _clearDetail: function(){
+    	$('.panel-detail').css('opacity','0.5');
+	    $('#provider-name').html('');
+    	$('#provider-description').html('');
+    	
+    }
+}
 
 $(document).ready(function(){
 	CLIENT.init();

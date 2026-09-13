@@ -94,11 +94,11 @@
 			form.unbind("submit", methods.onAjaxFormComplete);
 
 			// unbind live fields (kill)
-			form.find("["+options.validateAttribute+"*=validate]").not("[type=checkbox]").off(options.validationEventTrigger, methods._onFieldEvent);
-			form.find("["+options.validateAttribute+"*=validate][type=checkbox]").off("click", methods._onFieldEvent);
+			form.find("["+options.validateAttribute+"*=validate]").not("[type=checkbox]").die(options.validationEventTrigger, methods._onFieldEvent);
+			form.find("["+options.validateAttribute+"*=validate][type=checkbox]").die("click", methods._onFieldEvent);
 
 			// unbind form.submit
-			form.off("submit", methods.onAjaxFormComplete);
+			form.die("submit", methods.onAjaxFormComplete);
 			form.removeData('jqv');
 
 			if (options.autoPositionUpdate)
@@ -162,7 +162,7 @@
 			form.find('['+options.validateAttribute+'*=validate]').not(":disabled").each(function(){
 				var field = $(this);
 				var prompt = methods._getPrompt(field);
-				var promptText = $(prompt).find(".formErrorContent").text();
+				var promptText = $(prompt).find(".formErrorContent").html();
 
 				if(prompt)
 					methods._updatePrompt(field, $(prompt), promptText, undefined, false, options, noAnimation);
@@ -681,7 +681,7 @@
 			// first radio/checkbox of the group
 			var fieldType = field.prop("type");
 
-			if ((fieldType == "radio" || fieldType == "checkbox") && form.find("input[name='" + fieldName + "']").length > 1) {
+			if ((fieldType == "radio" || fieldType == "checkbox") && form.find("input[name='" + fieldName + "']").size() > 1) {
 				field = $(form.find("input[name='" + fieldName + "'][type!=hidden]:first"));
 				options.showArrow = false;
 			}
@@ -838,8 +838,8 @@
 				case "checkbox":
 					var form = field.closest("form");
 					var name = field.attr("name");
-					if (form.find("input[name='" + name + "']:checked").length == 0) {
-						if (form.find("input[name='" + name + "']:visible").length == 1)
+					if (form.find("input[name='" + name + "']:checked").size() == 0) {
+						if (form.find("input[name='" + name + "']:visible").size() == 1)
 							return options.allrules[rules[i]].alertTextCheckboxe;
 						else
 							return options.allrules[rules[i]].alertTextCheckboxMultiple;
@@ -1190,7 +1190,7 @@
 
 			var nbCheck = rules[i + 1];
 			var groupname = field.attr("name");
-			var groupSize = form.find("input[name='" + groupname + "']:checked").length;
+			var groupSize = form.find("input[name='" + groupname + "']:checked").size();
 			if (groupSize > nbCheck) {
 				options.showArrow = false;
 				if (options.allrules.maxCheckbox.alertText2)
@@ -1212,7 +1212,7 @@
 
 			var nbCheck = rules[i + 1];
 			var groupname = field.attr("name");
-			var groupSize = form.find("input[name='" + groupname + "']:checked").length;
+			var groupSize = form.find("input[name='" + groupname + "']:checked").size();
 			if (groupSize < nbCheck) {
 				options.showArrow = false;
 				return options.allrules.minCheckbox.alertText + " " + nbCheck + " " + options.allrules.minCheckbox.alertText2;
@@ -1463,7 +1463,7 @@
 				prompt.addClass("ajaxed");
 
 			// create the prompt content
-			var promptContent = $('<div>').addClass("formErrorContent").text(promptText).appendTo(prompt);
+			var promptContent = $('<div>').addClass("formErrorContent").html(promptText).appendTo(prompt);
 			// create the css arrow pointing at the field
 			// note that there is no triangle on max-checkbox and radio
 			if (options.showArrow) {
@@ -1550,7 +1550,7 @@
 				else
 					prompt.removeClass("ajaxed");
 
-				prompt.find(".formErrorContent").text(promptText);
+				prompt.find(".formErrorContent").html(promptText);
 
 				var pos = methods._calculatePosition(field, prompt, options);
 				var css = {"top": pos.callerTopPosition,
@@ -1898,4 +1898,5 @@
 	}};
 	$(function(){$.validationEngine.defaults.promptPosition = methods.isRTL()?'topLeft':"topRight"});
 })(jQuery);
+
 

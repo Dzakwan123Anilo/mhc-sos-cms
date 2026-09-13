@@ -10,4 +10,4 @@ docker exec -ti $CONTAINER_NAME bash \
 chmod -R 777 bootstrap && \
 chmod -R 777 storage && \
 rm -rf vendor && \
-composer install"
+/usr/local/bin/php /usr/bin/composer.phar install"

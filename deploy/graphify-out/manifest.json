@@ -1,0 +1,27 @@
+{
+  "build.sh": {
+    "mtime": 1789142546.3321116,
+    "ast_hash": "b9c088fc9fa359847f4a3d2d6b3ddb60",
+    "semantic_hash": "b9c088fc9fa359847f4a3d2d6b3ddb60"
+  },
+  "install.sh": {
+    "mtime": 1779086210.0,
+    "ast_hash": "284cd2be7faf62d820042953a6c963cb",
+    "semantic_hash": "284cd2be7faf62d820042953a6c963cb"
+  },
+  "run.sh": {
+    "mtime": 1789142546.3321748,
+    "ast_hash": "1caec371d48d7c50a35fbd33d0fca443",
+    "semantic_hash": "1caec371d48d7c50a35fbd33d0fca443"
+  },
+  "start-nginx.sh": {
+    "mtime": 1749097324.0,
+    "ast_hash": "da6f16f1f90c5b38cd41a01e28e66793",
+    "semantic_hash": "da6f16f1f90c5b38cd41a01e28e66793"
+  },
+  "start.sh": {
+    "mtime": 1789142546.3322034,
+    "ast_hash": "ef3a68540cdfade2e5a9b90efde905f4",
+    "semantic_hash": "ef3a68540cdfade2e5a9b90efde905f4"
+  }
+}

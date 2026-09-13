@@ -36,8 +36,6 @@ class Benefit extends AdminController {
 			'plugins/bootstrap/bootstrap-file-input.js',
 			'plugins/bootstrap/bootstrap-select.js',
 			'plugins/tagsinput/jquery.tagsinput.min.js',
-			'ckeditor/ckeditor.js',
-			'ckeditor/adapters/jquery.js'
 		);
  		
  		$this->load->model("mdl_reference","M");
@@ -207,4 +205,3 @@ class Benefit extends AdminController {
 	}
 
 }
-

@@ -212,12 +212,12 @@ $(document).ready(function(){
 	});
 	$('#btn_show').click(function(){
 		$.post(AJAX_URL+'/check_number',{clientid:$('#activation_clientid').val(),number:$('#activation_cardno').val(),field:'ai'},function(o){
-		    obj = eval('('+o+')');
+		    var obj = (o && typeof o === 'object') ? o : JSON.parse(o);
 			if(obj.status){
 				$('#form-show').submit();
 			} else {
 				$('#div-error').show();
-				$('#display-error').html(obj.error);
+				$('#display-error').text(obj.error);
 			}	
 	    });
 	});

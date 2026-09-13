@@ -79,7 +79,7 @@ $db['default'] = array(
 	'username' => $cfg['db']['username'],
 	'password' => $cfg['db']['password'],
 	'database' => $cfg['db']['database'],
-	'dbdriver' => 'mysqli',
+	'dbdriver' => $cfg['db']['dbdriver'],
 	'dbprefix' => '',
 	'pconnect' => FALSE,
 	'db_debug' => (ENVIRONMENT !== 'production'),

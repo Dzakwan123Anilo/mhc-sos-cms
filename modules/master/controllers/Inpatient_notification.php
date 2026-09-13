@@ -35,8 +35,6 @@ class Inpatient_notification extends AdminController {
 			'plugins/bootstrap/bootstrap-file-input.js',
 			'plugins/bootstrap/bootstrap-select.js',
 			'plugins/tagsinput/jquery.tagsinput.js',
-			'ckeditor/ckeditor.js',
-			'ckeditor/adapters/jquery.js'
 		);
  		
 // 		$this->load->model("mdl_master","M");
@@ -172,4 +170,3 @@ class Inpatient_notification extends AdminController {
 	}
 
 }
-

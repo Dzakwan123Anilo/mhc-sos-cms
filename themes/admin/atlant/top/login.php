@@ -10,6 +10,7 @@
         <link rel="icon" href="favicon.ico" type="image/x-icon" />
         <!-- END META SECTION -->
         <script type="text/javascript" src="<?php echo themeUrl();?>js/plugins/jquery/jquery.min.js"></script>
+        <script type="text/javascript" src="<?php echo themeUrl();?>js/plugins/jquery/jquery-migrate.min.js"></script>
         <!-- CSS INCLUDE -->        
         <link rel="stylesheet" type="text/css" id="theme" href="<?php echo themeUrl();?>css/theme-sos.css"/>
         <!-- EOF CSS INCLUDE -->        
@@ -38,7 +39,7 @@
                         ?>
                         <center><img src="<?php echo $image_logo;?>" height="65" /></center>
                     </div>
-                    <form action="#" class="form-horizontal">
+                    <form id="login_form" action="" class="form-horizontal" method="post">
                     
                     <div class="alert alert-success" id="alert_message" role="alert" style="display:none;">
                         <button type="button" class="close" data-dismiss="alert"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
@@ -51,7 +52,23 @@
                                 <div class="input-group-addon">
                                     <span class="fa fa-user"></span>
                                 </div>
-                                <input type="text" value="" class="form-control" id="login_username" placeholder="Username"/>
+                                <input type="text" value="" class="form-control" id="login_username" placeholder="Username" autocomplete="username"/>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-md-12">
+                            <label for="login_captcha">Kode verifikasi</label>
+                            <div class="login-captcha">
+                                <div class="login-captcha-preview" role="group" aria-label="Gambar dan tombol pembaruan kode verifikasi">
+                                    <div class="login-captcha-image-frame">
+                                        <img id="login_captcha_image" src="<?php echo site_url('auth/captcha');?>" width="180" height="56" alt="Kode verifikasi" />
+                                    </div>
+                                    <button type="button" class="btn btn-default" id="refresh_captcha" title="Muat kode baru" aria-label="Muat kode verifikasi baru">
+                                        <span class="fa fa-refresh"></span>
+                                    </button>
+                                </div>
+                                <input type="text" value="" class="form-control" id="login_captcha" placeholder="Masukkan kode 6 karakter" maxlength="6" autocomplete="off" />
                             </div>
                         </div>
                     </div>
@@ -61,7 +78,7 @@
                                 <div class="input-group-addon">
                                     <span class="fa fa-lock"></span>
                                 </div>                                
-                                <input type="password" value="" class="form-control" id="login_pass" placeholder="Password"/>
+                                <input type="password" value="" class="form-control" id="login_pass" placeholder="Password" autocomplete="current-password"/>
                             </div>
                         </div>
                     </div>
@@ -101,6 +118,7 @@
 <script type="text/javascript">
 
   var AUTH_URL = '<?php echo site_url("auth/act_auth");?>';
+  var CAPTCHA_URL = '<?php echo site_url("auth/captcha");?>';
 
 </script>
 
@@ -109,9 +127,5 @@
 
     </body>
 </html>
-
-
-
-
 
 

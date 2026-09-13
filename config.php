@@ -7,19 +7,12 @@
 //$cfg['db']['database'] = $_SERVER['MYSQL_DATABASE'];
 //$cfg['db']['port'] 	   = $_SERVER['MYSQL_PORT'];
 
-// $host = getenv('DB_HOST');
-// $port = getenv('DB_PORT');
-// $username = getenv('DB_USERNAME');
-// $password = getenv('DB_PASSWORD');
-// $name = getenv('DB_NAME');
-// $driver = getenv('DB_DRIVER');
-
-$host = "localhost";
-$port = "3306";
-$username = "root";
-$password = "naonao123!";
-$name = "sos_newsos";
-$driver = "mysqli";
+$host = getenv('DB_HOST') ?: '127.0.0.1';
+$port = getenv('DB_PORT') ?: '3306';
+$username = getenv('DB_USERNAME') ?: '';
+$password = getenv('DB_PASSWORD') ?: '';
+$name = getenv('DB_NAME') ?: '';
+$driver = getenv('DB_DRIVER') ?: 'mysqli';
 
 $cfg['db']['hostname'] = "$host:$port";
 $cfg['db']['username'] = $username;
@@ -42,6 +35,14 @@ $config['encryption_key']   = getenv('ENCRYPTION_KEY') ?: 'b8Xk2Np7VmR5qLwYzT3An
 
 $config['activeLog']        = true;
 $config['activeChat']       = false;
+
+/* authentication security */
+$config['login_lockout_minutes']       = 15;
+$config['login_max_attempts_account']  = 5;
+$config['login_max_attempts_ip']       = 20;
+$config['login_captcha_ttl']           = 300;
+$config['password_min_length']         = 8;
+$config['password_max_length']         = 32;
 
 $config['base_url']         = getenv('APP_BASE_URL') ?: "http://localhost:3004/";
 //$config['base_url']         = "https://mhc.internationalsos.co.id/";

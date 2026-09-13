@@ -12,6 +12,7 @@
         
         <!-- START PLUGINS -->
         <script type="text/javascript" src="<?php echo themeUrl();?>js/plugins/jquery/jquery.min.js"></script>
+        <script type="text/javascript" src="<?php echo themeUrl();?>js/plugins/jquery/jquery-migrate.min.js"></script>
         <script type="text/javascript" src="<?php echo themeUrl();?>js/plugins/jquery/jquery-ui.min.js"></script>
         <script type="text/javascript" src="<?php echo themeUrl();?>js/plugins/bootstrap/bootstrap.min.js"></script>        
         <!-- END PLUGINS -->
@@ -159,5 +160,4 @@
                 <div class="page-content-wrap">
                     <div class="row" style="margin:-20px 10px 10px 10px;">
                         <div class="col-md-12 panel" id="panel-content-wrap" style="border-radius:0px;padding:20px;">
-
 

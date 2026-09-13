@@ -320,12 +320,12 @@ $(document).ready(function(){
 	});
 	$('#btn_show').click(function(){
 		$.post(AJAX_URL+'/check_number',{clientid:$('#verify_clientid').val(),number:$('#verify_cardno').val()},function(o){
-		    obj = eval('('+o+')');
+		    var obj = (o && typeof o === 'object') ? o : JSON.parse(o);
 			if(obj.status){
 				$('#form-show').submit();
 			} else {
 				$('#div-error').show();
-				$('#display-error').html(obj.error);
+				$('#display-error').text(obj.error);
 			}	
 	    });
 	});

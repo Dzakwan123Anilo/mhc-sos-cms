@@ -39,6 +39,12 @@ class AdminController extends My_Controller{
 			redirect(site_url("auth"));
 		}
 
+		$must_change_password = !empty($this->jCfg['user']['must_change_password']);
+		$is_change_password_page = $this->_getClass() === 'me' && $this->_getMethod() === 'change_password';
+		if($must_change_password && !$is_change_password_page){
+			redirect(site_url('meme/me/change_password'));
+		}
+
 		if($this->_getClass()!= 'me' ){
 			$this->_set_array_actions();
 			if(in_array($this->_getMethod(),$this->arr_actions)){
@@ -211,22 +217,19 @@ class AdminController extends My_Controller{
 		$this->sCfg['search']['order_by'] = $this->input->get('sort_by');
 		$this->sCfg['search']['order_dir'] = $this->input->get('sort_dir');
 		$this->_releaseSession();
-		$next = $this->input->get('next')&&trim($this->input->get('next'))!=""?$this->input->get('next'):site_url();
-		redirect($next);
+		redirect($this->_safe_internal_url($this->input->get('next'), site_url()));
 	}
 
 	function per_page(){
 		$this->sCfg['search']['per_page'] = $this->input->get('per_page');
 		$this->_releaseSession();
-		$next = $this->input->get('next')&&trim($this->input->get('next'))!=""?$this->input->get('next'):site_url();
-		redirect($next);
+		redirect($this->_safe_internal_url($this->input->get('next'), site_url()));
 	}
 
 	function set_status(){
 		$this->sCfg['search']['status'] = $this->input->get('status');
 		$this->_releaseSession();
-		$next = $this->input->get('next')&&trim($this->input->get('next'))!=""?$this->input->get('next'):site_url();
-		redirect($next);
+		redirect($this->_safe_internal_url($this->input->get('next'), site_url()));
 	}
 	
 	function print_preview(){

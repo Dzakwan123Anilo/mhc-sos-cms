@@ -1,0 +1,162 @@
+{
+  "audit": "MHC SOS security remediation browser evidence",
+  "completed_at": "2026-09-12T02:07:57+07:00",
+  "tool": {
+    "browser": "Orca embedded browser",
+    "orca_version": "1.4.198",
+    "profile": "isolated temporary profile",
+    "base_url": "http://127.0.0.1:1881/",
+    "workspace_mount": "read-only"
+  },
+  "credential_handling": {
+    "authorized_account_used": true,
+    "password_recorded_in_evidence": false,
+    "password_changed": false
+  },
+  "captcha_ui_follow_up": {
+    "completed_at": "2026-09-12T02:51:23+07:00",
+    "status": "PASS",
+    "desktop": {
+      "viewport": "1281x1047",
+      "captcha_image": "180x56",
+      "refresh_button": "48x58",
+      "captcha_input": "330x42",
+      "image_refresh_overlap": false,
+      "preview_input_overlap": false,
+      "all_elements_within_form": true
+    },
+    "mobile": {
+      "emulated_device": "iPhone 12",
+      "viewport": "390x844",
+      "device_pixel_ratio": 3,
+      "captcha_image": "180x56",
+      "refresh_button": "48x58",
+      "captcha_input": "300x42",
+      "image_refresh_overlap": false,
+      "preview_input_overlap": false,
+      "all_elements_within_viewport": true,
+      "all_elements_within_form": true
+    },
+    "refresh": {
+      "cache_buster_added": true,
+      "input_cleared": true,
+      "reloaded_image_dimensions": "180x56"
+    },
+    "browser_console_errors": 0,
+    "browser_console_warnings": 0,
+    "evidence": [
+      "01-login-captcha.png",
+      "07-login-captcha-fixed.png"
+    ]
+  },
+  "findings": [
+    {
+      "finding": "Vulnerable JavaScript Library",
+      "status": "PASS",
+      "observed_versions": {
+        "jquery": "3.7.1",
+        "jquery_migrate": "3.5.2",
+        "jquery_ui": "1.14.1",
+        "bootstrap": "4.6.2",
+        "moment": "2.30.1",
+        "datatables": "1.13.11",
+        "jquery_validation_loaded": true
+      },
+      "retirejs_5_7_0_vulnerabilities": 0,
+      "obsolete_ckeditor_url_status": 404,
+      "evidence": [
+        "04-runtime-security-checks.png",
+        "06-obsolete-ckeditor-removed-404.png",
+        "static-validation.txt"
+      ]
+    },
+    {
+      "finding": "Bruteforceable Login Page",
+      "status": "PASS_WITH_SAFE_LIMIT",
+      "invalid_captcha_http_status": 422,
+      "account_attempt_limit": 5,
+      "ip_attempt_limit": 20,
+      "lockout_minutes": 15,
+      "nginx_login_rate": "10 requests/minute",
+      "nginx_burst": 5,
+      "full_lockout_triggered": false,
+      "reason_full_lockout_not_triggered": "Avoid locking the authorized account or shared test IP",
+      "evidence": [
+        "02-invalid-captcha-rejected.png",
+        "static-validation.txt"
+      ]
+    },
+    {
+      "finding": "Weak Password Policy",
+      "status": "PASS",
+      "mandatory_change_redirect": true,
+      "dashboard_guard_redirect": true,
+      "missing_special_character_rejected": true,
+      "rejection_message": "Password harus mengandung karakter spesial",
+      "password_changed": false,
+      "evidence": [
+        "03-forced-password-policy.png",
+        "04-runtime-security-checks.png"
+      ]
+    },
+    {
+      "finding": ".htaccess Disclosure",
+      "status": "PASS",
+      "request_path": "/.htaccess",
+      "http_status": 404,
+      "server_version_disclosed": false,
+      "evidence": [
+        "05-htaccess-protected-404.png",
+        "static-validation.txt"
+      ]
+    },
+    {
+      "finding": "No CAPTCHA",
+      "status": "PASS",
+      "captcha_dimensions": "180x56",
+      "captcha_content_type": "image/png",
+      "refresh_worked": true,
+      "invalid_or_expired_answer_rejected": true,
+      "evidence": [
+        "01-login-captcha.png",
+        "02-invalid-captcha-rejected.png",
+        "07-login-captcha-fixed.png"
+      ]
+    },
+    {
+      "finding": "External URL Redirect",
+      "status": "PASS",
+      "external_absolute_url_blocked": true,
+      "protocol_relative_url_blocked": true,
+      "same_origin_internal_url_allowed": true,
+      "evidence": [
+        "04-runtime-security-checks.png"
+      ]
+    },
+    {
+      "finding": "Dangerous JavaScript Functions",
+      "status": "PASS",
+      "payload_rendered_as_text": true,
+      "inserted_image_elements": 0,
+      "xss_event_triggered": false,
+      "evidence": [
+        "04-runtime-security-checks.png"
+      ]
+    }
+  ],
+  "browser_console": {
+    "errors": 0,
+    "warnings": 0,
+    "informational_message": "JQMIGRATE: Migrate is installed, version 3.5.2"
+  },
+  "static_validation": {
+    "php_version": "8.4.15",
+    "php_files_linted": 33,
+    "php_failures": 0,
+    "node_version": "v22.23.2",
+    "javascript_files_checked": 21,
+    "javascript_failures": 0,
+    "nginx_configuration_valid": true,
+    "git_diff_check_clean": true
+  }
+}

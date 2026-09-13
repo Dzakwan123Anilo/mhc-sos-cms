@@ -6,5 +6,3 @@ listen = /var/run/php-fpm.sock
 listen.owner = www-data
 listen.group = www-data
 listen.mode = 0666
-
-php_admin_value[expose_php] = Off

@@ -179,6 +179,9 @@ class User extends AdminController {
 	function save(){
 
 		$site_id = $this->input->post('user_site_id');
+		$user_id = dbClean((string)$this->input->post('user_id'));
+		$raw_pass = (string)$this->input->post('user_password', false);
+		$confirm_pass = (string)$this->input->post('user_password2', false);
 		$data = array(
 			'user_fullname'			=> $this->input->post('user_fullname'),
 			'user_name'				=> $this->input->post('user_name'),
@@ -191,20 +194,28 @@ class User extends AdminController {
 		);		
 		
 
-		if( isset($_POST['user_password']) && trim($_POST['user_password']) != ''){
-			$raw_pass = dbClean($_POST['user_password']);
+		if($raw_pass !== ''){
 			$validation = validate_password_strength($raw_pass);
-			if($validation === true){
-				$data['user_password'] = password_hash($raw_pass, PASSWORD_ARGON2ID);
+			if($validation !== true){
+				show_error(htmlspecialchars($validation, ENT_QUOTES, 'UTF-8'), 422, 'Password tidak valid');
+				return;
 			}
+			if(!hash_equals($raw_pass, $confirm_pass)){
+				show_error('Konfirmasi password tidak sama.', 422, 'Password tidak valid');
+				return;
+			}
+			$data['user_password'] = password_hash($raw_pass, PASSWORD_ARGON2ID);
+		}elseif($user_id === ''){
+			show_error('Password wajib diisi untuk user baru.', 422, 'Password tidak valid');
+			return;
 		}
 		
 		$a = $this->_save_master( 
 			$data,
 			array(
-				'user_id' => dbClean($_POST['user_id'])
-			),
-			dbClean($_POST['user_id'])			
+					'user_id' => $user_id
+				),
+				$user_id
 		);
 
 		$id = $a['id'];

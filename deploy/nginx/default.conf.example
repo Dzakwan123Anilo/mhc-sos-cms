@@ -29,10 +29,6 @@ server {
         deny all;
         return 403;
     }
-    location ~ /adminer\.php {
-        deny all;
-        return 403;
-    }
     location = /sos_db.sql {
         deny all;
         return 403;

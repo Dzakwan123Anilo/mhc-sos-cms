@@ -6,3 +6,4 @@ assets/assets
 .DS_Store
 deploy/.variables
 .serena/
+/application/logs

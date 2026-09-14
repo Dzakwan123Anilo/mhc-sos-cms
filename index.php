@@ -70,9 +70,6 @@ ob_start();
 
 	// The controller function you wish to be called.
 	// $routing['function']	= '';
-?>
-
-<?php
 
 /*
  * -------------------------------------------------------------------

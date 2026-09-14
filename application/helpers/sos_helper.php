@@ -874,5 +874,3 @@ function check_number($clientid="",$number="",$field="") {
 		return array('status' => false, 'error' => $msg); 
 	}
 }
-	
-?>

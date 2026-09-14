@@ -161,7 +161,10 @@
     function take_snapshot() {
         Webcam.snap( function(data_uri) {
             $('#div_result').fadeIn();
-            $('#result_camera').html( '<img src="'+data_uri+'"/>');
+            $('#result_camera').empty().append($('<img>', {
+                src: data_uri,
+                alt: 'Camera preview'
+            }));
         } );
     }
 

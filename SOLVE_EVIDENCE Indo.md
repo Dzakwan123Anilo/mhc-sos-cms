@@ -567,7 +567,7 @@ Method `env()` telah **dihapus** dari class controller `Auth`.
 #### Kode Rentan (Sebelum)
 
 ```php
-$config['encryption_key'] = 'r3m4j4Id4m4n';
+$config['encryption_key'] = '[nilai legacy disamarkan]';
 ```
 
 **Masalah**: Frasa bahasa Indonesia pendek berbasis kamus. Mudah ditebak/di-brute-force. Digunakan di `_encrypt()`/`_decrypt()` untuk enkripsi parameter URL. Dikombinasikan dengan `.git` exposure (A3), kunci ini memungkinkan pemalsuan session (lihat rantai serangan di laporan).
@@ -577,14 +577,15 @@ $config['encryption_key'] = 'r3m4j4Id4m4n';
 **Berkas**: `config.php:41`:
 
 ```php
-$config['encryption_key'] = getenv('ENCRYPTION_KEY') ?: 'b8Xk2Np7VmR5qLwYzT3AnFc6UdE9hJ4S';
+$config['encryption_key'] = getenv('ENCRYPTION_KEY') ?: '';
 ```
 
 #### Mengapa Ini Menyelesaikan Masalah
 
-1. `getenv('ENCRYPTION_KEY')` — membaca dari environment, memungkinkan kunci unik per deployment.
-2. Fallback `'b8Xk2Np7VmR5qLwYzT3AnFc6UdE9hJ4S'` — string alfanumerik pseudo-random 32 karakter, entropi ~190 bit. Secara komputasi mustahil untuk di-brute-force dibandingkan kata kamus.
-3. **Catatan kritis**: Set env var `ENCRYPTION_KEY` di konfigurasi Docker production untuk mencegah fallback dibagikan antar deployment.
+1. `getenv('ENCRYPTION_KEY')` membaca kunci unik per deployment; tidak ada kunci yang disimpan di source control.
+2. `deploy/run.sh` menolak start jika kunci kurang dari 32 karakter.
+3. Token URL sekarang menggunakan AES-256-GCM terautentikasi sehingga perubahan token dapat terdeteksi.
+4. Rotasikan kunci legacy yang mungkin masih ada di riwayat repository sebelum deployment.
 
 ---
 

@@ -1,62 +1,81 @@
 server {
-    listen  1880;
-    # server_name mysite.com www.mysite.com;
+    listen 1880;
 
-    root   /home/app;
+    root /home/app;
     autoindex off;
-    index  index.php;
+    index index.php;
 
-    add_header Strict-Transport-Security "max-age=63072000; includeSubdomains; preload" always;
+    add_header Strict-Transport-Security "max-age=63072000; includeSubDomains; preload" always;
     add_header X-Frame-Options "SAMEORIGIN" always;
-    add_header X-XSS-Protection "1; mode=block" always;
     add_header X-Content-Type-Options "nosniff" always;
     add_header Referrer-Policy "strict-origin-when-cross-origin" always;
+    add_header Permissions-Policy "camera=(), microphone=(), geolocation=()" always;
+    add_header Content-Security-Policy "object-src 'none'; base-uri 'self'; frame-ancestors 'self'" always;
 
-    # block sensitive directories and files
-    location ~ /\.git {
-        deny all;
-        return 403;
+    fastcgi_hide_header X-Powered-By;
+
+    # Never serve repository metadata, dotfiles, source code, sessions, or stale editors.
+    location ~ /\.(?!well-known(?:/|$)) {
+        return 404;
     }
-    location ~ /\.env {
-        deny all;
-        return 403;
+    location ~* ^/(?:application|system|modules|deploy|sessions)(?:/|$) {
+        return 404;
+    }
+    location ~* ^/(?:assets|themes)/.*ckeditor(?:__)?/ {
+        return 404;
+    }
+    location ~* ^/themes/admin/atlant/(?:assets/(?:filetree(?:_sample)?|plugins/nvd3)|js/plugins/(?:filetree|tableexport|tour))(?:/|$) {
+        return 404;
+    }
+    location ~* \.(?:bak|dist|ini|log|sh|sql|swp)$ {
+        return 404;
+    }
+    location ~* ^/[^/]+\.(?:csv|docx?|md|pdf|txt|xlsx?)$ {
+        return 404;
     }
     location = /adminer.php {
-        deny all;
-        return 403;
+        return 404;
     }
     location = /config.php {
-        deny all;
-        return 403;
-    }
-    location = /sos_db.sql {
-        deny all;
-        return 403;
+        return 404;
     }
 
-    # set expiration of assets to MAX for caching
-    location ~* \.(ico|css|js|gif|jpe?g|png)$ {
-           expires max;
-           log_not_found off;
+    location ~ ^/(?:index\.php/)?auth/act_auth/?$ {
+        limit_req zone=auth_limit burst=5 nodelay;
+        limit_req_status 429;
+        try_files $uri /index.php?$query_string;
     }
 
-    # main codeigniter rewrite rule
+    # Serve only explicitly allowed public assets. Files in the repository root
+    # (including reports, documentation, and spreadsheets) are never exposed.
+    location ~* ^/(?:assets|themes)/.+\.(?:ico|css|js|gif|jpe?g|png|webp|svg|woff2?|ttf|eot|mp3|wav|pdf|xlsx?|csv|docx?|mp4|avi|mov|mpe?g)$ {
+        expires 7d;
+        log_not_found off;
+        try_files $uri =404;
+    }
+
+    location = /favicon.ico {
+        expires 7d;
+        log_not_found off;
+        try_files $uri =404;
+    }
+
     location / {
-        try_files $uri $uri/ /index.php?$query_string;
+        rewrite ^ /index.php last;
     }
 
-    # php parsing
-     location ~ .php$ {
-        root          /home/app;
-        try_files $uri $uri/ /index.php?$query_string;
-        fastcgi_pass   unix:/var/run/php-fpm.sock;
-        # fastcgi_pass   127.0.0.1:9000;
-        fastcgi_index  index.php;
-        fastcgi_param  SCRIPT_FILENAME /home/app$fastcgi_script_name;
-        include       fastcgi_params;
+    # Only the front controller may execute PHP.
+    location = /index.php {
+        include fastcgi_params;
+        fastcgi_pass unix:/var/run/php-fpm.sock;
+        fastcgi_param SCRIPT_FILENAME /home/app/index.php;
+        fastcgi_param SCRIPT_NAME /index.php;
         fastcgi_buffer_size 128k;
         fastcgi_buffers 256 4k;
         fastcgi_busy_buffers_size 256k;
         fastcgi_temp_file_write_size 256k;
+    }
+    location ~ \.php(?:/|$) {
+        return 404;
     }
 }

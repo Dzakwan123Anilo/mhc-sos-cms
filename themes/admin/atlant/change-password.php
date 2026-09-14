@@ -4,21 +4,22 @@
         	<div class="row form-group">  
               <div class="col-md-3 control-label">Password Lama</div>
               <div class="col-md-3">
-                <input type="password" id="old_pass" maxlength="50" name="old_pass" class="validate[required] form-control" value="" />
+                <input type="password" id="old_pass" maxlength="128" name="old_pass" class="validate[required] form-control" value="" autocomplete="current-password" />
               </div>
             </div> 
 
             <div class="row form-group">
               <div class="col-md-3 control-label">Password Baru</div>
               <div class="col-md-3">
-                <input type="password" id="new_pass" name="new_pass" maxlength="50" class="validate[required] form-control" value="" />
+                <input type="password" id="new_pass" name="new_pass" maxlength="128" class="validate[required,length[12,128]] form-control" value="" autocomplete="new-password" />
+                <small class="help-block">Minimal 12 karakter, dengan huruf besar, huruf kecil, angka, dan karakter spesial.</small>
               </div> 
             </div>
 
              <div class="row form-group">
               <div class="col-md-3 control-label">Ulangi Password Baru</div>
               <div class="col-md-3">
-                <input type="password" id="new_pass2" name="new_pass2" maxlength="50" class="validate[equals[new_pass]] form-control" value="<?php echo isset($val->ag_group_desc)?$val->ag_group_desc:'';?>" />
+                <input type="password" id="new_pass2" name="new_pass2" maxlength="128" class="validate[required,equals[new_pass]] form-control" value="" autocomplete="new-password" />
               </div> 
             </div> 
 

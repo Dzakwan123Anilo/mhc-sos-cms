@@ -38,7 +38,8 @@
                         ?>
                         <center><img src="<?php echo $image_logo;?>" height="65" /></center>
                     </div>
-                    <form action="javascript:void(0)" class="form-horizontal">
+                    <form action="<?php echo site_url('auth/act_auth');?>" method="post" id="login_form" class="form-horizontal">
+                    <input type="hidden" name="login" value="1" />
                     
                     <div class="alert alert-success" id="alert_message" role="alert" style="display:none;">
                         <button type="button" class="close" data-dismiss="alert"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
@@ -51,7 +52,7 @@
                                 <div class="input-group-addon">
                                     <span class="fa fa-user"></span>
                                 </div>
-                                <input type="text" value="" class="form-control" id="login_username" placeholder="Username"/>
+                                <input type="text" value="" class="form-control" id="login_username" name="username" placeholder="Username" autocomplete="username" maxlength="80"/>
                             </div>
                         </div>
                     </div>
@@ -61,21 +62,27 @@
                                 <div class="input-group-addon">
                                     <span class="fa fa-lock"></span>
                                 </div>                                
-                                <input type="password" value="" class="form-control" id="login_pass" placeholder="Password"/>
+                                <input type="password" value="" class="form-control" id="login_pass" name="password" placeholder="Password" autocomplete="current-password" maxlength="128"/>
                             </div>
                         </div>
                     </div>
-                    <!--<div class="form-group">
-                        <div class="col-md-6">
-                            <a href="#">Lupa password?</a>
-                        </div>          
-                        <div class="col-md-6 text-right">
-                            <a href="#">Buat account baru</a>
-                        </div>              
-                    </div>-->
                     <div class="form-group">
                         <div class="col-md-12">
-                            <button class="btn btn-primary btn-lg btn-block" id="btn_login">Log In</button>
+                            <label for="login_captcha">Kode verifikasi</label>
+                            <div class="input-group">
+                                <span class="input-group-addon" style="padding:0; background:#fff;">
+                                    <img id="captcha_image" src="<?php echo site_url('auth/captcha_image');?>" width="180" height="54" alt="Kode verifikasi" />
+                                </span>
+                                <input type="text" value="" class="form-control" id="login_captcha" name="captcha" placeholder="6 karakter" autocomplete="off" autocapitalize="characters" maxlength="6"/>
+                                <span class="input-group-btn">
+                                    <button class="btn btn-default" id="btn_refresh_captcha" type="button" aria-label="Ganti kode verifikasi"><span class="fa fa-refresh"></span></button>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-md-12">
+                            <button type="submit" class="btn btn-primary btn-lg btn-block" id="btn_login">Log In</button>
                         </div>
                     </div>
                     </form>
@@ -100,7 +107,8 @@
 
 <script type="text/javascript">
 
-  var AUTH_URL = '<?php echo site_url("auth/act_auth");?>';
+  var AUTH_URL = <?php echo json_encode(site_url('auth/act_auth'));?>;
+  var CAPTCHA_URL = <?php echo json_encode(site_url('auth/captcha_image'));?>;
 
 </script>
 
@@ -109,9 +117,6 @@
 
     </body>
 </html>
-
-
-
 
 
 

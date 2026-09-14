@@ -567,7 +567,7 @@ The `env()` method has been **removed** from the `Auth` controller class.
 #### Vulnerable Code (Before)
 
 ```php
-$config['encryption_key'] = 'r3m4j4Id4m4n';
+$config['encryption_key'] = '[legacy value redacted]';
 ```
 
 **Issue**: Short dictionary-based Indonesian phrase. Easily guessable/brute-forceable. Used in `_encrypt()`/`_decrypt()` for URL parameter encryption. Combined with `.git` exposure (A3), this key enables session forgery (see attack chain in report).
@@ -577,14 +577,15 @@ $config['encryption_key'] = 'r3m4j4Id4m4n';
 **File**: `config.php:41`:
 
 ```php
-$config['encryption_key'] = getenv('ENCRYPTION_KEY') ?: 'b8Xk2Np7VmR5qLwYzT3AnFc6UdE9hJ4S';
+$config['encryption_key'] = getenv('ENCRYPTION_KEY') ?: '';
 ```
 
 #### Why It Solves the Issue
 
-1. `getenv('ENCRYPTION_KEY')` — reads from the environment, allowing per-deployment unique keys.
-2. Fallback `'b8Xk2Np7VmR5qLwYzT3AnFc6UdE9hJ4S'` — 32-char pseudo-random alphanumeric string, entropy ~190 bits. Computationally infeasible to brute-force compared to dictionary word.
-3. **Critical note**: Set `ENCRYPTION_KEY` env var in production Docker config to prevent the fallback from being shared across deployments.
+1. `getenv('ENCRYPTION_KEY')` reads a per-deployment key; no key is stored in source control.
+2. `deploy/run.sh` refuses to start unless the key is at least 32 characters long.
+3. URL tokens now use authenticated AES-256-GCM, preventing undetected tampering.
+4. Rotate any legacy key that may still exist in repository history before deployment.
 
 ---
 

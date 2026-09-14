@@ -2,7 +2,7 @@
 
 ## Overview
 
-CodeIgniter 3.0.4 CMS for MHC SOS (International SOS) — a claims management system used by Indonesian hospitals to verify insured members and submit Inpatient / Outpatient / Dental / Emergency claims. Intended for **PHP 8.4**.
+CodeIgniter 3.1.13 CMS for MHC SOS (International SOS) — a claims management system used by Indonesian hospitals to verify insured members and submit Inpatient / Outpatient / Dental / Emergency claims. Intended for **PHP 8.4**.
 
 ---
 
@@ -20,13 +20,16 @@ CodeIgniter 3.0.4 CMS for MHC SOS (International SOS) — a claims management sy
 
 | Library | Version | Path |
 |---------|---------|------|
-| CodeIgniter | 3.0.4 | `system/` |
+| CodeIgniter | 3.1.13 | `system/` |
 | MX (HMVC) | 5.5 | `application/third_party/MX/` |
-| PHPMailer | 5.x | `application/libraries/phpmailer5/` |
+| PHPMailer | 7.1.1 | `application/libraries/phpmailer/` |
 | PHPExcel | — | `application/libraries/PHPExcel/` |
 | Adminer | 4.8.1 | `/adminer.php` |
-| CKEditor | vendored | `assets/js/ckeditor/` |
-| jQuery | 1.7.2 | `assets/js/` |
+| Highcharts | 13.0.2 | `assets/js/vendor/highcharts/` |
+| jQuery | 3.7.1 | `themes/admin/atlant/js/plugins/jquery/` |
+| jQuery Migrate | 3.6.0 | `themes/admin/atlant/js/plugins/jquery/` |
+| jQuery UI | 1.14.1 | `themes/admin/atlant/js/plugins/jquery/` |
+| Bootstrap JS | 3.4.1 | `themes/admin/atlant/js/plugins/bootstrap/` |
 
 There is no package manager — add libraries by copying files.
 
@@ -217,7 +220,7 @@ Key tables (production data prefixes):
 ## Flow (User Perspective)
 
 1. User opens the web application → lands on `/auth` (login page)
-2. On success, `Auth::act_auth()` looks up `app_user` by username + MD5 password → checks `app_user_group` for roles → checks `app_acl_group_accesses` for permissions → loads provider group info → stores all in `$this->session` → redirects to `meme/me/welcome`
+2. On success, `Auth::act_auth()` validates CAPTCHA and rate limits, verifies the `app_user` Argon2id password (with one-time legacy MD5 migration), checks roles/provider access, regenerates the session ID, then redirects to `meme/me/welcome`
 3. Dashboard (`meme/me`): shows member verification form — user enters card number → searches `sos_member` + `sos_client` + `sos_ref_plan_type` → displays member profile and claim history
 4. Claim submission (`meme/me/save_claim`): enters claim data → fraud detection (>2 same-service claims/day = flagged) → sends email notification for inpatient / fraud
 5. Admin modules: CRUD for clients, members, providers, reference data, users, groups, ACL
@@ -258,11 +261,13 @@ Modules typically load ONE model: `$this->load->model("mdl_{module}","M")`. The 
 - **ACTIVITY LOGGING IS ENABLED** (`activeLog=true` in root config). Every request writes to `app_log` table (class, method, URL, user, IP, POST/GET data). Methods in the exclusion list (line 479-482 of `MY_Controller.php`) are skipped — update this list when adding high-volume AJAX endpoints.
 - Chat feature is disabled (`activeChat=false`).
 
-### Security Quirks
+### Security Notes
 
-- Passwords are **MD5** hashed — do not change the hash algorithm without updating the auth flow, user management forms, and the `generate_user` scripts.
+- New and changed passwords use **Argon2id**. Login retains a narrowly scoped MD5 fallback solely to migrate existing hashes after a successful login; do not add new MD5 writers.
+- Authentication requires a server-side CAPTCHA and applies file-backed rate limits by IP address and username.
 - CSRF protection is **disabled**. Enabling it will break the existing AJAX and form submissions unless all views are updated with CSRF tokens.
-- `adminer.php` is publicly accessible at the root. No built-in web auth. Consider moving it or protecting it at nginx level in production.
+- `adminer.php` remains in the source tree for controlled maintenance, but the production nginx configuration returns `404` for it and for every PHP file except `index.php`.
+- DB, SMTP, base URL, trusted proxies, and encryption key are deployment environment variables. Never commit `deploy/.variables`.
 
 ### Ad-Hoc Helpers
 
@@ -271,9 +276,10 @@ Many utility functions in `core_helper.php` and `sos_helper.php` reference hardc
 ### Docker
 
 ```
-deploy/start.sh        →  build + run (passes DB env vars via --env, uses --net=host)
+deploy/start.sh        →  validates variables, builds the image, then starts the restricted-port container
 deploy/build.sh        →  reads .variables, runs docker build
-deploy/run.sh          →  reads .variables, runs docker run; mounts cwd as /home/app
+deploy/run.sh          →  reads ignored .variables, publishes only APP_PORT, mounts CMS_SOURCE_PATH at /home/app, and uses a named session volume
+deploy/security-smoke.sh →  validates the PHP 8.4 image, vendored mail/Excel libraries, nginx headers, and sensitive-file denial rules
 ```
 
 The `install.sh` runs `composer install` but there is no `composer.json` — this step will fail and is harmless. The container works without it.

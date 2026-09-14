@@ -2,57 +2,60 @@ GROUP_PROVIDER = {
     init: function(){
         GROUP_PROVIDER.selectAll();
         $("#provider_clientid").change(function(){
-        	if($('#providergroupId').val() == '') {
-        	    $.post(URL_GET_DATA_PROVIDER,function(o){
-        		    obj = eval('('+o+')');
+	if($('#providergroupId').val() == '') {
+	    $.post(URL_GET_DATA_PROVIDER,function(o){
+		    obj = JSON.parse(o);
 
-        		    $('#dt-provider').dataTable().fnDestroy();
-        		    GROUP_PROVIDER.htmlProvider(obj.provider);
-        		    $('#dt-provider').dataTable({
-        				"bPaginate": false,
-        				"pageLength": 1000000
-        			});        		    
-        	    });
-        	}
+		    $('#dt-provider').dataTable().fnDestroy();
+		    GROUP_PROVIDER.htmlProvider(obj.provider);
+		    $('#dt-provider').dataTable({
+				"bPaginate": false,
+				"pageLength": 1000000
+			});
+	    });
+	}
         });
     },
     htmlProvider: function(obj){
-    	html = '';ap=$('#table-provider');
-    	ap.html('');
+	html = '';ap=$('#table-provider');
+	ap.html('');
 	    if(obj.length > 0){
-		    
+
 		    no=0;
-	    	$.each(obj,function(k,v){
-		    	 html ='<tr>';
-		    	 html +='<td>';
-		    	 html +='<input type="checkbox" name="item_select['+v.provider_id+']" value="'+v.provider_id+'" class="item_select" id="item_select_'+v.provider_id+'" />';
-		    	 html +='</td>';
-			     html +='<td>'+v.provider_name+'</td>';
-			     html +='<td>'+v.provider_name_edc+'</td>';
-			     html +='<td>'+v.provider_code+'</td>';
-			     html +='<td>'+v.provider_type+'</td>';
-			     html +='<td>'+v.provider_phone+'</td>';
-			     html +='<td>'+v.provider_email+'</td>';
-			     html +='<td>'+v.provider_region+'</td>';
-			     html +='<td>'+v.provider_location+'</td>';
-				 html += '</tr>';
-				 
-				 ap.append(html);
-	    	});   	
-	    	
-	    }  	    	
+		$.each(obj,function(k,v){
+				var providerId = String(v.provider_id == null ? '' : v.provider_id);
+				var row = $('<tr>');
+				var checkbox = $('<input>', {
+					type: 'checkbox',
+					name: 'item_select[' + providerId + ']',
+					value: providerId,
+					'class': 'item_select',
+					id: 'item_select_' + providerId
+				});
+				$('<td>').append(checkbox).appendTo(row);
+				$.each([
+					v.provider_name, v.provider_name_edc, v.provider_code,
+					v.provider_type, v.provider_phone, v.provider_email,
+					v.provider_region, v.provider_location
+				], function(index, value){
+					$('<td>').text(value == null ? '' : value).appendTo(row);
+				});
+				ap.append(row);
+		});
+
+	    }
     },
     selectAll: function(){
-        
+
         $("#select_all").change(function(){
             if(this.checked){
               $("input.item_select").each(function(){
                 this.checked=true;
-              })              
+              })
             }else{
               $("input.item_select").each(function(){
                 this.checked=false;
-              })              
+              })
             }
         });
 
@@ -62,8 +65,8 @@ GROUP_PROVIDER = {
               $("input.item_select").each(function(){
                 if(!this.checked)
                    isAllChecked = 1;
-              })              
-              if(isAllChecked == 0){ $("#select_all").prop("checked", true); }     
+              })
+              if(isAllChecked == 0){ $("#select_all").prop("checked", true); }
             }
             else {
               $("#select_all").prop("checked", false);

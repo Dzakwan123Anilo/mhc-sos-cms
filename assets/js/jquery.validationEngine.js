@@ -94,11 +94,11 @@
 			form.unbind("submit", methods.onAjaxFormComplete);
 
 			// unbind live fields (kill)
-			form.find("["+options.validateAttribute+"*=validate]").not("[type=checkbox]").die(options.validationEventTrigger, methods._onFieldEvent);
-			form.find("["+options.validateAttribute+"*=validate][type=checkbox]").die("click", methods._onFieldEvent);
+			form.find("["+options.validateAttribute+"*=validate]").not("[type=checkbox]").off(options.validationEventTrigger, methods._onFieldEvent);
+			form.find("["+options.validateAttribute+"*=validate][type=checkbox]").off("click", methods._onFieldEvent);
 
 			// unbind form.submit
-			form.die("submit", methods.onAjaxFormComplete);
+			form.off("submit", methods.onAjaxFormComplete);
 			form.removeData('jqv');
 
 			if (options.autoPositionUpdate)
@@ -681,7 +681,7 @@
 			// first radio/checkbox of the group
 			var fieldType = field.prop("type");
 
-			if ((fieldType == "radio" || fieldType == "checkbox") && form.find("input[name='" + fieldName + "']").size() > 1) {
+			if ((fieldType == "radio" || fieldType == "checkbox") && form.find("input[name='" + fieldName + "']").length > 1) {
 				field = $(form.find("input[name='" + fieldName + "'][type!=hidden]:first"));
 				options.showArrow = false;
 			}
@@ -838,8 +838,8 @@
 				case "checkbox":
 					var form = field.closest("form");
 					var name = field.attr("name");
-					if (form.find("input[name='" + name + "']:checked").size() == 0) {
-						if (form.find("input[name='" + name + "']:visible").size() == 1)
+					if (form.find("input[name='" + name + "']:checked").length == 0) {
+						if (form.find("input[name='" + name + "']:visible").length == 1)
 							return options.allrules[rules[i]].alertTextCheckboxe;
 						else
 							return options.allrules[rules[i]].alertTextCheckboxMultiple;
@@ -1190,7 +1190,7 @@
 
 			var nbCheck = rules[i + 1];
 			var groupname = field.attr("name");
-			var groupSize = form.find("input[name='" + groupname + "']:checked").size();
+			var groupSize = form.find("input[name='" + groupname + "']:checked").length;
 			if (groupSize > nbCheck) {
 				options.showArrow = false;
 				if (options.allrules.maxCheckbox.alertText2)
@@ -1212,7 +1212,7 @@
 
 			var nbCheck = rules[i + 1];
 			var groupname = field.attr("name");
-			var groupSize = form.find("input[name='" + groupname + "']:checked").size();
+			var groupSize = form.find("input[name='" + groupname + "']:checked").length;
 			if (groupSize < nbCheck) {
 				options.showArrow = false;
 				return options.allrules.minCheckbox.alertText + " " + nbCheck + " " + options.allrules.minCheckbox.alertText2;

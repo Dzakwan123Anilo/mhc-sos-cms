@@ -250,7 +250,7 @@ $(document).ready(function(){
 
         if(claiminf.status == 1) {
 	        for(var i=0; i<id.length; i++) {
-	        	$('#'+id[i]).html(claiminf.data[idabj[i]]);
+	            $('#'+id[i]).text(claiminf.data[idabj[i]]);
 	        }
 	    	
 	        $(this).find("td").each(function(){

@@ -12,75 +12,24 @@ class Me extends AdminController {
 	}
 	
 	function te(){
-		debugCode($this->jCfg['user']);
+		show_404();
 	}
 	
 	function update_user(){
-		$m = $this->db->query("SELECT * FROM sos_provider ORDER BY provider_id ASC")->result();
-		foreach((array)$m as $k=>$v){
-			$username = "mhc".$v->provider_code;
-			$cek = $this->db->get_where("app_user",array("user_name" => $username))->num_rows();
-			if( $cek == 1 ){
-				$this->db->update("app_user",array(
-					'user_password'	=> password_hash("mhc".$v->provider_code, PASSWORD_ARGON2ID),
-					'user_name'		=> $v->provider_code
-				),array(
-					"user_name" => $username
-				));
-				echo "Code ".$v->provider_code."<br />";
-			}
-		}
+		show_404();
 	}
 	function generate_userxxxxx(){
-		$m = $this->db->query("SELECT * FROM sos_provider ORDER BY provider_id ASC")->result();
-		foreach((array)$m as $k=>$v){
-			$username = "mhc".$v->provider_code;
-			$password = "123123";
-			$cek = $this->db->get_where("app_user",array("user_name" => $username))->num_rows();
-			if( $cek == 0 ){
-				$data = array(
-					'user_fullname'			=> $v->provider_name,
-					'user_name'				=> $username,
-					'user_email'			=> "mail@mail.com",
-					'user_telp'				=> "021-0000000",
-					'user_site_id'			=> 1000,
-					'user_providerid'		=> $v->provider_id,
-					'is_show_all'			=> 0,
-				'user_status'			=> 1,
-				'user_password'			=> password_hash($password, PASSWORD_ARGON2ID)
-				);
-				
-				$this->db->insert("app_user",$data);
-				$user_id = $this->db->insert_id();
-				
-				$cek1 = $this->db->get_where("app_user_group",array(
-						"ug_user_id"	=> $user_id,
-						"ug_group_id"	=> 27
-					))->num_rows();
-					
-				if( $cek1 == 0 ){
-					$this->db->insert("app_user_group",array(
-						"ug_user_id"	=> $user_id,
-						"ug_group_id"	=> 27,
-						"ug_status"		=> 1
-					));
-				}
-			}
-		}
-		
+		show_404();
 	}
 	function set_theme(){
 		$menu = $this->jCfg['theme_setting']['menu']=="top"?"left":"top";
 		$this->sCfg['theme_setting']['menu'] = $menu;
 		$this->_releaseSession();
-		$go = isset($_GET['next'])?$this->input->get('next'):site_url('meme/me');
-		redirect($go);	
+		redirect($this->_safe_redirect_url($this->input->get('next'), site_url('meme/me')));
 	}
 
 	function index_all(){ 
 		$this->is_dashboard = false;
-		$this->css_file[] = 'daterangepicker/daterangepicker-bs3.css';
-		$this->js_file[] = 'page/init.daterangepicker.js';
     $this->own_link = site_url('meme/me');
 
 		$data = array();
@@ -96,12 +45,7 @@ class Me extends AdminController {
 		$this->js_plugins = array(
 			'plugins/bootstrap/bootstrap-select.js',
 			'plugins/bootstrap/bootstrap-datepicker.js',
-			'plugins/bootstrap/bootstrap-timepicker.min.js',
-			'plugins/moment.min.js',
-			'plugins/daterangepicker/daterangepicker.js',
-			'plugins/knob/jquery.knob.min.js',
-			'plugins/morris/raphael-min.js',
-			'plugins/morris/morris.min.js'
+			'plugins/bootstrap/bootstrap-timepicker.min.js'
 		);
 		
 		if(isset($_POST['btn_show'])){ 			
@@ -147,8 +91,6 @@ class Me extends AdminController {
 
 	function index(){ 
 		$this->is_dashboard = false;
-		$this->css_file[] = 'daterangepicker/daterangepicker-bs3.css';
-		$this->js_file[] = 'page/init.daterangepicker.js';
     $this->own_link = site_url('meme/me');
 
 		$data = array();
@@ -156,9 +98,7 @@ class Me extends AdminController {
 		$this->js_plugins = array(
 			'plugins/bootstrap/bootstrap-select.js',
 			'plugins/bootstrap/bootstrap-datepicker.js',
-			'plugins/bootstrap/bootstrap-timepicker.min.js',
-			'plugins/moment.min.js',
-			'plugins/daterangepicker/daterangepicker.js'
+			'plugins/bootstrap/bootstrap-timepicker.min.js'
 		);
 		$data['card_no'] = '';
 		if(isset($_POST['verify_cardno']) && !empty($_POST['verify_cardno'])){ 	
@@ -222,13 +162,7 @@ class Me extends AdminController {
             
 		$this->js_plugins = array(
 			'plugins/bootstrap/bootstrap-select.js',
-			'plugins/bootstrap/bootstrap-datepicker.js',
-			'plugins/bootstrap/bootstrap-timepicker.min.js',
-			'plugins/moment.min.js',
-			'plugins/daterangepicker/daterangepicker.js',
-			'plugins/knob/jquery.knob.min.js',
-			'plugins/morris/raphael-min.js',
-			'plugins/morris/morris.min.js'
+			'plugins/bootstrap/bootstrap-datepicker.js'
 		);
 		
 //		$data['activemember'] = getNumberActiveMember();
@@ -1015,7 +949,9 @@ class Me extends AdminController {
 		$this->is_dashboard = TRUE;
 		$pesan="";
 		if(isset($_POST['btn_simpan'])){
-			$old_pass = dbClean($_POST['old_pass']);
+			$old_pass = (string) $this->input->post('old_pass');
+			$new_pass = (string) $this->input->post('new_pass');
+			$new_pass_confirmation = (string) $this->input->post('new_pass2');
 			$this->DATA->table="app_user";
 			$m1 = $this->DATA->_getall(array(
 				"user_name"		=> $this->jCfg['user']['name']
@@ -1026,7 +962,8 @@ class Me extends AdminController {
 				$user = $m1[0];
 				if(password_verify($old_pass, $user->user_password)){
 					$password_valid = true;
-				}elseif($user->user_password === md5($old_pass)){
+				}elseif(preg_match('/^[a-f0-9]{32}$/i', (string) $user->user_password)
+					&& hash_equals(strtolower((string) $user->user_password), md5($old_pass))){
 					$password_valid = true;
 				}
 			}
@@ -1035,10 +972,15 @@ class Me extends AdminController {
 				$pesan ="Your old password is not correctly!";
 				$mtype = "error";
 			}else{
-				$new_pass = dbClean($_POST['new_pass']);
 				$validation = validate_password_strength($new_pass);
 				if($validation !== true){
 					$pesan = $validation;
+					$mtype = "error";
+				}elseif(!hash_equals($new_pass, $new_pass_confirmation)){
+					$pesan = 'Konfirmasi password baru tidak sama';
+					$mtype = "error";
+				}elseif(hash_equals($old_pass, $new_pass)){
+					$pesan = 'Password baru harus berbeda dari password lama';
 					$mtype = "error";
 				}else{
 					$pass_baru = password_hash($new_pass, PASSWORD_ARGON2ID);
@@ -1050,12 +992,12 @@ class Me extends AdminController {
 						)
 
 					);
-					$pesan = ($mx)?"Success update your password":"Success update your password";
+					$pesan = ($mx)?"Success update your password":"Unable to update your password";
 					$mtype = ($mx)?"success":"error";
 				}
 			}
 
-			redirect($this->own_link."/change_password?msg=".urldecode($pesan)."&type_msg=".$mtype);
+			redirect($this->own_link."/change_password?msg=".rawurlencode($pesan)."&type_msg=".$mtype);
 		}
 
 		
@@ -1103,6 +1045,3 @@ class Me extends AdminController {
     $this->_v("welcome", array());
   }
 }
-
-
-

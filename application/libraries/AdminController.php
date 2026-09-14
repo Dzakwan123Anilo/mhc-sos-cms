@@ -211,22 +211,19 @@ class AdminController extends My_Controller{
 		$this->sCfg['search']['order_by'] = $this->input->get('sort_by');
 		$this->sCfg['search']['order_dir'] = $this->input->get('sort_dir');
 		$this->_releaseSession();
-		$next = $this->input->get('next')&&trim($this->input->get('next'))!=""?$this->input->get('next'):site_url();
-		redirect($next);
+		redirect($this->_safe_redirect_url($this->input->get('next'), site_url()));
 	}
 
 	function per_page(){
 		$this->sCfg['search']['per_page'] = $this->input->get('per_page');
 		$this->_releaseSession();
-		$next = $this->input->get('next')&&trim($this->input->get('next'))!=""?$this->input->get('next'):site_url();
-		redirect($next);
+		redirect($this->_safe_redirect_url($this->input->get('next'), site_url()));
 	}
 
 	function set_status(){
 		$this->sCfg['search']['status'] = $this->input->get('status');
 		$this->_releaseSession();
-		$next = $this->input->get('next')&&trim($this->input->get('next'))!=""?$this->input->get('next'):site_url();
-		redirect($next);
+		redirect($this->_safe_redirect_url($this->input->get('next'), site_url()));
 	}
 	
 	function print_preview(){

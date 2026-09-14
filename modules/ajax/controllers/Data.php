@@ -9,19 +9,51 @@ class Data extends FrontController {
 	
 	function index() {}
 
+	/**
+	 * Escape values rendered into the small HTML fragments returned by this
+	 * controller. These endpoints are consumed by jQuery .html(), so values
+	 * read from the database must never be interpolated as markup.
+	 */
+	private function _html($value){
+		return htmlspecialchars((string)$value, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+	}
+
+	private function _export_link($method, array $args, $value){
+		$json = json_encode(array_values($args), JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT);
+		if ($json === false) {
+			return $this->_html($value);
+		}
+
+		return '<a href="#" class="js-export-link" data-export-method="'
+			. $this->_html($method) . '" data-export-args="'
+			. $this->_html($json) . '">' . $this->_html($value) . '</a>';
+	}
+
+	private function _numeric_or_link($value, $method, array $args){
+		$value = (int)$value;
+		return $value > 0 ? $this->_export_link($method, $args, $value) : $this->_html($value);
+	}
+
 	function kota(){
 		
 		$prov = $this->input->post('prov');
 		$kota = $this->input->post('kota');
-		$where = empty($prov)?array():array("kab_propinsi_id" => $this->db->get_where("app_propinsi",array("propinsi_nama" => $prov))->row()->propinsi_id, "kab_status" => 1);
+		$where = array('kab_status' => 1);
+		if (!empty($prov)) {
+			$province = $this->db->get_where("app_propinsi", array("propinsi_nama" => $prov))->row();
+			if ($province && isset($province->propinsi_id)) {
+				$where['kab_propinsi_id'] = $province->propinsi_id;
+			}
+		}
 		
 		$this->db->order_by("kab_nama");
 		$m = $this->db->get_where("app_kabupaten",$where)->result();
 
 		$html = "<option value=''> - pilih kota/kabupaten - </option>";
 		foreach ((array)$m as $k => $v) {
+			$name = $this->_html($v->kab_nama);
 			$s = $v->kab_nama==$kota?'selected="selected"':'';
-			$html .= "<option value='".$v->kab_nama."' $s >".$v->kab_nama."</option>";
+			$html .= "<option value=\"".$name."\" $s >".$name."</option>";
 		}
 
 		die($html);
@@ -120,15 +152,19 @@ class Data extends FrontController {
     if(count($data) > 0 ) {
         $no = 0; $cname = ''; $m = 1;
         foreach($data as $r) {
-          $date = $year.'-'.($month-$m).'-'.date('d');
-          
+          $clientName = $cname != $r->client_name ? $this->_html($r->client_name) : '';
+          $clientId = (string)$r->client_id;
+          $genDate = (string)$r->gen_date;
+          $mainInsured = (int)$r->main_insured;
+          $dependent = (int)$r->dependent;
+
           $html .= '<tr>';
           $html .= '	<td>'.++$no.'</td>';
-          $html .= '	<td nowrap="nowrap">'.($cname!=$r->client_name?$r->client_name:'').'</td>';
-          $html .= '	<td nowrap="nowrap">'.$r->showit.'</td>';
-          $html .= '	<td>'.($r->main_insured>0?'<a href="javascript:void(0)" onclick="EXPORT_DATA.activeMemberExport(0,\'\',\''.$r->client_id.'\',\''.$r->gen_date.'\',0)">'.$r->main_insured.'</a>':$r->main_insured).'</td>';
-          $html .= '	<td>'.($r->dependent>0?'<a href="javascript:void(0)" onclick="EXPORT_DATA.activeMemberExport(0,\'\',\''.$r->client_id.'\',\''.$r->gen_date.'\',1)">'.$r->dependent.'</a>':$r->dependent).'</td>';
-          $html .= '	<td>'.(($r->main_insured+$r->dependent)>0?'<a href="javascript:void(0)" onclick="EXPORT_DATA.activeMemberExport(0,\'\',\''.$r->client_id.'\',\''.$r->gen_date.'\',2)">'.($r->main_insured+$r->dependent).'</a>':($r->main_insured+$r->dependent)).'</td>';
+          $html .= '	<td nowrap="nowrap">'.$clientName.'</td>';
+          $html .= '	<td nowrap="nowrap">'.$this->_html($r->showit).'</td>';
+          $html .= '	<td>'.$this->_numeric_or_link($mainInsured, 'activeMemberExport', array(0, '', $clientId, $genDate, 0)).'</td>';
+          $html .= '	<td>'.$this->_numeric_or_link($dependent, 'activeMemberExport', array(0, '', $clientId, $genDate, 1)).'</td>';
+          $html .= '	<td>'.$this->_numeric_or_link($mainInsured + $dependent, 'activeMemberExport', array(0, '', $clientId, $genDate, 2)).'</td>';
           $html .= '</tr>';
                   
           $cname = $r->client_name;
@@ -180,16 +216,24 @@ class Data extends FrontController {
         foreach($data as $r) {
           $date = $m<0?date('Y-m-d'):$year.'-'.($month-$m).'-'.date('d');
           $today = $m<0?'':$m+1;
-          
+          $clientName = $cname != $r->client_name ? $this->_html($r->client_name) : '';
+          $clientId = (string)$r->client_id;
+          $genDate = (string)$r->gen_date;
+          $inpatient = (int)$r->inpatient;
+          $outpatient = (int)$r->outpatient;
+          $dental = (int)$r->dental;
+          $emergency = (int)$r->emergency;
+          $total = $inpatient + $outpatient + $dental + $emergency;
+
           $html .= '<tr>';
           $html .= '	<td>'.++$no.'</td>';
-          $html .= '	<td nowrap="nowrap">'.($cname!=$r->client_name?$r->client_name:'').'</td>';
-          $html .= '	<td nowrap="nowrap">'.$r->showit.'</td>';
-          $html .= '	<td>'.($r->inpatient>0?'<a href="javascript:void(0)" onclick="EXPORT_DATA.swipeByClientExport(0,\'\',\''.$r->client_id.'\',\''.$r->gen_date.'\',\''.$today.'\',1)">'.$r->inpatient.'</a>':$r->inpatient).'</td>';
-          $html .= '	<td>'.($r->outpatient>0?'<a href="javascript:void(0)" onclick="EXPORT_DATA.swipeByClientExport(0,\'\',\''.$r->client_id.'\',\''.$r->gen_date.'\',\''.$today.'\',2)">'.$r->outpatient.'</a>':$r->outpatient).'</td>';
-          $html .= '	<td>'.($r->dental>0?'<a href="javascript:void(0)" onclick="EXPORT_DATA.swipeByClientExport(0,\'\',\''.$r->client_id.'\',\''.$r->gen_date.'\',\''.$today.'\',3)">'.$r->dental.'</a>':$r->dental).'</td>';
-          $html .= '	<td>'.($r->emergency>0?'<a href="javascript:void(0)" onclick="EXPORT_DATA.swipeByClientExport(0,\'\',\''.$r->client_id.'\',\''.$r->gen_date.'\',\''.$today.'\',4)">'.$r->emergency.'</a>':$r->emergency).'</td>';
-          $html .= '	<td>'.(($r->inpatient+$r->outpatient+$r->dental+$r->emergency)>0?'<a href="javascript:void(0)" onclick="EXPORT_DATA.swipeByClientExport(0,\'\',\''.$r->client_id.'\',\''.$r->gen_date.'\',\''.$today.'\',0)">'.($r->inpatient+$r->outpatient+$r->dental+$r->emergency).'</a>':($r->inpatient+$r->outpatient+$r->dental+$r->emergency)).'</td>';
+          $html .= '	<td nowrap="nowrap">'.$clientName.'</td>';
+          $html .= '	<td nowrap="nowrap">'.$this->_html($r->showit).'</td>';
+          $html .= '	<td>'.$this->_numeric_or_link($inpatient, 'swipeByClientExport', array(0, '', $clientId, $genDate, $today, 1)).'</td>';
+          $html .= '	<td>'.$this->_numeric_or_link($outpatient, 'swipeByClientExport', array(0, '', $clientId, $genDate, $today, 2)).'</td>';
+          $html .= '	<td>'.$this->_numeric_or_link($dental, 'swipeByClientExport', array(0, '', $clientId, $genDate, $today, 3)).'</td>';
+          $html .= '	<td>'.$this->_numeric_or_link($emergency, 'swipeByClientExport', array(0, '', $clientId, $genDate, $today, 4)).'</td>';
+          $html .= '	<td>'.$this->_numeric_or_link($total, 'swipeByClientExport', array(0, '', $clientId, $genDate, $today, 0)).'</td>';
           $html .= '</tr>';
                   
           $cname = $r->client_name;
@@ -239,16 +283,24 @@ class Data extends FrontController {
       foreach($data as $r) {
         $date = $m<0?date('Y-m-d'):$year.'-'.($month-$m).'-'.date('d');
         $today = $m<0?'':$m+1;
-        
+        $clientName = $cname != $r->client_name ? $this->_html($r->client_name) : '';
+        $clientId = (string)$r->client_id;
+        $genDate = (string)$r->gen_date;
+        $inpatient = (int)$r->inpatient;
+        $outpatient = (int)$r->outpatient;
+        $dental = (int)$r->dental;
+        $emergency = (int)$r->emergency;
+        $total = $inpatient + $outpatient + $dental + $emergency;
+
         $html .= '<tr>';
         $html .= '	<td>'.++$no.'</td>';
-        $html .= '	<td nowrap="nowrap">'.($cname!=$r->client_name?$r->client_name:'').'</td>';
-        $html .= '	<td nowrap="nowrap">'.$r->showit.'</td>';
-        $html .= '	<td>'.($r->inpatient>0?'<a href="javascript:void(0)" onclick="EXPORT_DATA.swipeMoreExport(0,\'\',\''.$r->client_id.'\',\''.$r->gen_date.'\',\''.$today.'\',1)">'.$r->inpatient.'</a>':$r->inpatient).'</td>';
-        $html .= '	<td>'.($r->outpatient>0?'<a href="javascript:void(0)" onclick="EXPORT_DATA.swipeMoreExport(0,\'\',\''.$r->client_id.'\',\''.$r->gen_date.'\',\''.$today.'\',2)">'.$r->outpatient.'</a>':$r->outpatient).'</td>';
-        $html .= '	<td>'.($r->dental>0?'<a href="javascript:void(0)" onclick="EXPORT_DATA.swipeMoreExport(0,\'\',\''.$r->client_id.'\',\''.$r->gen_date.'\',\''.$today.'\',3)">'.$r->dental.'</a>':$r->dental).'</td>';
-        $html .= '	<td>'.($r->emergency>0?'<a href="javascript:void(0)" onclick="EXPORT_DATA.swipeMoreExport(0,\'\',\''.$r->client_id.'\',\''.$r->gen_date.'\',\''.$today.'\',4)">'.$r->emergency.'</a>':$r->emergency).'</td>';
-        $html .= '	<td>'.(($r->inpatient+$r->outpatient+$r->dental+$r->emergency)>0?'<a href="javascript:void(0)" onclick="EXPORT_DATA.swipeMoreExport(0,\'\',\''.$r->client_id.'\',\''.$r->gen_date.'\',\''.$today.'\',0)">'.($r->inpatient+$r->outpatient+$r->dental+$r->emergency).'</a>':($r->inpatient+$r->outpatient+$r->dental+$r->emergency)).'</td>';
+        $html .= '	<td nowrap="nowrap">'.$clientName.'</td>';
+        $html .= '	<td nowrap="nowrap">'.$this->_html($r->showit).'</td>';
+        $html .= '	<td>'.$this->_numeric_or_link($inpatient, 'swipeMoreExport', array(0, '', $clientId, $genDate, $today, 1)).'</td>';
+        $html .= '	<td>'.$this->_numeric_or_link($outpatient, 'swipeMoreExport', array(0, '', $clientId, $genDate, $today, 2)).'</td>';
+        $html .= '	<td>'.$this->_numeric_or_link($dental, 'swipeMoreExport', array(0, '', $clientId, $genDate, $today, 3)).'</td>';
+        $html .= '	<td>'.$this->_numeric_or_link($emergency, 'swipeMoreExport', array(0, '', $clientId, $genDate, $today, 4)).'</td>';
+        $html .= '	<td>'.$this->_numeric_or_link($total, 'swipeMoreExport', array(0, '', $clientId, $genDate, $today, 0)).'</td>';
         $html .= '</tr>';
                 
         $cname = $r->client_name;
@@ -302,55 +354,30 @@ class Data extends FrontController {
 		foreach($datas as $s){
 			$date = $mt<0?date('Y-m-d'):$year.'-'.($amonth-$mt).'-1';
 			$today = $mt<0?'':$mt+1;
+			$providerName = $pname != $s->provider_name ? $this->_html($s->provider_name) : '';
+			$providerId = (string)$s->provider_id;
+			$genDate = (string)$s->gen_date;
+			$inpatient = (int)$s->inpatient;
+			$outpatient = (int)$s->outpatient;
+			$dental = (int)$s->dental;
+			$emergency = (int)$s->emergency;
+			$total = (int)$s->total;
 		 	
 			$html .= '<tr>';
 			$html .= '	<td>'.++$no.'</td>';
-			$html .= '	<td nowrap="nowrap">'.($pname!=$s->provider_name?$s->provider_name:'').'</td>';
-			$html .= '	<td nowrap="nowrap">'.$s->showit.'</td>';
-			$html .= '	<td>'.($s->inpatient>0?'<a href="javascript:void(0)" onclick="EXPORT_DATA.swipeByProviderExport(0,\'\',\''.$s->provider_id.'\',\''.$s->gen_date.'\',\''.$today.'\',1)">'.$s->inpatient.'</a>':$s->inpatient).'</td>';
-			$html .= '	<td>'.($s->outpatient>0?'<a href="javascript:void(0)" onclick="EXPORT_DATA.swipeByProviderExport(0,\'\',\''.$s->provider_id.'\',\''.$s->gen_date.'\',\''.$today.'\',2)">'.$s->outpatient.'</a>':$s->outpatient).'</td>';
-			$html .= '	<td>'.($s->dental>0?'<a href="javascript:void(0)" onclick="EXPORT_DATA.swipeByProviderExport(0,\'\',\''.$s->provider_id.'\',\''.$s->gen_date.'\',\''.$today.'\',3)">'.$s->dental.'</a>':$s->dental).'</td>';
-			$html .= '	<td>'.($s->emergency>0?'<a href="javascript:void(0)" onclick="EXPORT_DATA.swipeByProviderExport(0,\'\',\''.$s->provider_id.'\',\''.$s->gen_date.'\',\''.$today.'\',4)">'.$s->emergency.'</a>':$s->emergency).'</td>';
-			$html .= '	<td>'.($s->total>0?'<a href="javascript:void(0)" onclick="EXPORT_DATA.swipeByProviderExport(0,\'\',\''.$s->provider_id.'\',\''.$s->gen_date.'\',\''.$today.'\',0)">'.$s->total.'</a>':$s->total).'</td>';
+			$html .= '	<td nowrap="nowrap">'.$providerName.'</td>';
+			$html .= '	<td nowrap="nowrap">'.$this->_html($s->showit).'</td>';
+			$html .= '	<td>'.$this->_numeric_or_link($inpatient, 'swipeByProviderExport', array(0, '', $providerId, $genDate, $today, 1)).'</td>';
+			$html .= '	<td>'.$this->_numeric_or_link($outpatient, 'swipeByProviderExport', array(0, '', $providerId, $genDate, $today, 2)).'</td>';
+			$html .= '	<td>'.$this->_numeric_or_link($dental, 'swipeByProviderExport', array(0, '', $providerId, $genDate, $today, 3)).'</td>';
+			$html .= '	<td>'.$this->_numeric_or_link($emergency, 'swipeByProviderExport', array(0, '', $providerId, $genDate, $today, 4)).'</td>';
+			$html .= '	<td>'.$this->_numeric_or_link($total, 'swipeByProviderExport', array(0, '', $providerId, $genDate, $today, 0)).'</td>';
 			$html .= '</tr>';
 			
 			$pname = $s->provider_name;
 		}
 
     die($html);
-
-    /*
-		$html = ''; $xno = 0;  
-		foreach($swipeprovider as $r){
-			$m = empty($fmonth)?2:0; $mt = 1;	
-			for($i=0; $i<$x; $i++) {
-				$data = getSingleNumberSwipeByProvider(array('providerid' => $r->provider_id, 'month' => empty($fmonth)?($month-$m):($month+$i), 'flag' => $f, 'multi' => $x, 'fmonth' => $fmonth, 'year' => $year));
-				$pname = ''; $no = $xno;
-				foreach($data as $s){
-					$date = $mt<0?date('Y-m-d'):$year.'-'.($amonth-$mt).'-1';
-					$today = $mt<0?'':$mt+1;
-				 	
-					$html .= '<tr>';
-					$html .= '	<td>'.++$no.'</td>';
-					$html .= '	<td nowrap="nowrap">'.($pname!=$s->provider_name?$s->provider_name:'').'</td>';
-					$html .= '	<td nowrap="nowrap">'.$s->showit.'</td>';
-					$html .= '	<td>'.($s->inpatient>0?'<a href="javascript:void(0)" onclick="EXPORT_DATA.swipeByProviderExport(0,\'\',\''.$r->provider_id.'\',\''.$date.'\',\''.$today.'\',1)">'.$s->inpatient.'</a>':$s->inpatient).'</td>';
-					$html .= '	<td>'.($s->outpatient>0?'<a href="javascript:void(0)" onclick="EXPORT_DATA.swipeByProviderExport(0,\'\',\''.$r->provider_id.'\',\''.$date.'\',\''.$today.'\',2)">'.$s->outpatient.'</a>':$s->outpatient).'</td>';
-					$html .= '	<td>'.($s->dental>0?'<a href="javascript:void(0)" onclick="EXPORT_DATA.swipeByProviderExport(0,\'\',\''.$r->provider_id.'\',\''.$date.'\',\''.$today.'\',3)">'.$s->dental.'</a>':$s->dental).'</td>';
-					$html .= '	<td>'.($s->emergency>0?'<a href="javascript:void(0)" onclick="EXPORT_DATA.swipeByProviderExport(0,\'\',\''.$r->provider_id.'\',\''.$date.'\',\''.$today.'\',4)">'.$s->emergency.'</a>':$s->emergency).'</td>';
-					$html .= '	<td>'.($s->total>0?'<a href="javascript:void(0)" onclick="EXPORT_DATA.swipeByProviderExport(0,\'\',\''.$r->provider_id.'\',\''.$date.'\',\''.$today.'\',0)">'.$s->total.'</a>':$s->total).'</td>';
-					$html .= '</tr>';
-					
-					$pname = $s->provider_name;
-				}
-				$xno = $no;
-				if(empty($fmonth)) $m--;
-				$mt--;
-			}
-		}
-		
-		die($html);
-    */
 	}
 
 	function get_user_login(){		
@@ -360,12 +387,17 @@ class Data extends FrontController {
 		$data = getNumberUserLogin(array('providerid' => $providerid));
 		$no = 0;
 		foreach($data as $r){
+			$providerId = (string)$r->provider_id;
+			$providerName = $this->_html($r->provider_name);
+			$prev = (int)$r->prev;
+			$curr = (int)$r->curr;
+			$today = (int)$r->today;
 			$html .= '<tr>';
 			$html .= '	<td>'.++$no.'</td>';
-			$html .= '	<td nowrap="nowrap">'.$r->provider_name.'</td>';
-			$html .= '	<td>'.($r->prev>0?'<a href="javascript:void(0)" onclick="EXPORT_DATA.userLoginExport(0,\'\',\''.$r->provider_id.'\',1)">'.$r->prev.'</a>':$r->prev).'</td>';
-			$html .= '	<td>'.($r->curr>0?'<a href="javascript:void(0)" onclick="EXPORT_DATA.userLoginExport(0,\'\',\''.$r->provider_id.'\',2)">'.$r->curr.'</a>':$r->curr).'</td>';
-			$html .= '	<td>'.($r->today>0?'<a href="javascript:void(0)" onclick="EXPORT_DATA.userLoginExport(0,\'\',\''.$r->provider_id.'\',3)">'.$r->today.'</a>':$r->today).'</td>';
+			$html .= '	<td nowrap="nowrap">'.$providerName.'</td>';
+			$html .= '	<td>'.$this->_numeric_or_link($prev, 'userLoginExport', array(0, '', $providerId, 1)).'</td>';
+			$html .= '	<td>'.$this->_numeric_or_link($curr, 'userLoginExport', array(0, '', $providerId, 2)).'</td>';
+			$html .= '	<td>'.$this->_numeric_or_link($today, 'userLoginExport', array(0, '', $providerId, 3)).'</td>';
 			$html .= '</tr>';
 		}
 		

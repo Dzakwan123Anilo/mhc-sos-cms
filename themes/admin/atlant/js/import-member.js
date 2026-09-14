@@ -43,7 +43,7 @@ IMPORT_MEMBER = {
        if (typeof ID != "undefined") {
 
             $('#tr_item_info_'+ID).fadeIn("medium",function(){
-              $('#msg_item_'+ID).html('Loading..');
+              $('#msg_item_'+ID).text('Loading..');
               $('#tr_item_'+ID).css('opacity','0.3');
             });
 
@@ -69,16 +69,16 @@ IMPORT_MEMBER = {
                 import_id:IMPORT_ID
             };
             $.post(AJAX_URL_IMPORT,parData,function(res){
-                obj = eval('('+res+')');
+                obj = JSON.parse(res);
                 if( obj.status == 1 ){
                   SUKSES++;
-                  $('#count_success').html(SUKSES);
-                  $('#msg_item_'+ID).html("<span style='color:green;'>"+obj.message+"</span>");
+                  $('#count_success').text(SUKSES);
+                  $('#msg_item_'+ID).empty().append($('<span>').css('color', 'green').text(obj.message));
                 }
                 if( obj.status == 0 ){
                   GAGAL++;
-                  $('#count_gagal').html(GAGAL);
-                  $('#msg_item_'+ID).html("<span style='color:red;'>"+obj.message+"</span>");
+                  $('#count_gagal').text(GAGAL);
+                  $('#msg_item_'+ID).empty().append($('<span>').css('color', 'red').text(obj.message));
                   
                 }
                 
@@ -94,10 +94,12 @@ IMPORT_MEMBER = {
     },
     btnOnLoading: function(obj,status){
         if( status=='START' ){
-            $('#btn_approve').removeClass('btn-warning').html('silahkan tunggu!, Loading....');
+            $('#btn_approve').removeClass('btn-warning').text('silahkan tunggu!, Loading....');
         }
         if( status=='SELESAI'){
-            $('#btn_approve').addClass('btn-warning').html('<i class="fa fa-check"></i> Approve');
+            $('#btn_approve').addClass('btn-warning').empty()
+                .append($('<i>', {'class': 'fa fa-check'}))
+                .append(document.createTextNode(' Approve'));
         }
     }
 }

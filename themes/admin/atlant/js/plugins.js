@@ -563,10 +563,7 @@ $(function() {
                 $("#new-event").on("click",function(){
                     var et = $("#new-event-text").val();
                     if(et != ''){
-                        $("#external-events").prepend($('<a>', {
-                            'class': 'list-group-item external-event',
-                            text: et
-                        }));
+                        $("#external-events").prepend('<a class="list-group-item external-event">'+et+'</a>');
                         prepare_external_list();
                     }
                 });

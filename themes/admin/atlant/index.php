@@ -321,12 +321,12 @@ $(document).ready(function(){
 	});
 	$('#btn_show').click(function(){
 		$.post(AJAX_URL+'/check_number',{clientid:$('#verify_clientid').val(),number:$('#verify_cardno').val()},function(o){
-		    obj = JSON.parse(o);
+		    obj = eval('('+o+')');
 			if(obj.status){
 				$('#form-show').submit();
 			} else {
 				$('#div-error').show();
-				$('#display-error').text(obj.error);
+				$('#display-error').html(obj.error);
 			}	
 	    });
 	});

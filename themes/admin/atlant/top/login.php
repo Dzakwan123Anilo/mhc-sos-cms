@@ -10,7 +10,6 @@
         <link rel="icon" href="favicon.ico" type="image/x-icon" />
         <!-- END META SECTION -->
         <script type="text/javascript" src="<?php echo themeUrl();?>js/plugins/jquery/jquery.min.js"></script>
-        <script type="text/javascript" src="<?php echo themeUrl();?>js/plugins/jquery/jquery-migrate.min.js"></script>
         <!-- CSS INCLUDE -->        
         <link rel="stylesheet" type="text/css" id="theme" href="<?php echo themeUrl();?>css/theme-sos.css"/>
         <!-- EOF CSS INCLUDE -->        
@@ -110,6 +109,8 @@
 
     </body>
 </html>
+
+
 
 
 

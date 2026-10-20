@@ -133,8 +133,7 @@
               <div class="col-md-5 control-label">Password</div>
               <div class="col-md-7">
 
-                   <input type="password" id="user_password" name="user_password" class="<?php echo isset($val->user_password)?'validate[length[12,128]]':'validate[required,length[12,128]]';?> form-control" value="" autocomplete="new-password" maxlength="128" />
-                   <small class="help-block">Minimal 12 karakter, dengan huruf besar, huruf kecil, angka, dan karakter spesial.</small>
+                   <input type="password" id="user_password" name="user_password" class="<?php echo isset($val->user_password)?']':'validate[required,length[6,20]]';?> form-control" value="" />
 
               </div> 
             </div> 
@@ -143,7 +142,7 @@
               <div class="col-md-5 control-label">Confirm Password</div> 
               <div class="col-md-7">
 
-                   <input type="password" id="user_password2" name="user_password2" class="<?php echo isset($val->user_password)?'validate[equals[user_password]]':'validate[required,equals[user_password]]';?> form-control" value="" autocomplete="new-password" maxlength="128" />
+                   <input type="password" id="user_password2" name="user_password2" class="<?php echo isset($val->user_password)?'validate[equals[user_password]]':'validate[required,equals[user_password]]';?> form-control"  value="" />
 
               </div> 
             </div> 

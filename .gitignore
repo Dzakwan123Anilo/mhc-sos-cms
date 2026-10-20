@@ -1,9 +1,4 @@
 sessions/*
-!sessions/.gitkeep
 assets/tmp-report/*
 assets/collections/*
 assets/assets
-.DS_Store
-deploy/.variables
-.serena/
-/application/logs

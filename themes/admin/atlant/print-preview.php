@@ -10,7 +10,6 @@
         <link rel="icon" href="favicon.ico" type="image/x-icon" />
         <!-- END META SECTION -->
         <script type="text/javascript" src="<?php echo themeUrl();?>js/plugins/jquery/jquery.min.js"></script>
-        <script type="text/javascript" src="<?php echo themeUrl();?>js/plugins/jquery/jquery-migrate.min.js"></script>
         <!-- CSS INCLUDE -->        
         <link rel="stylesheet" type="text/css" id="theme" href="<?php echo themeUrl();?>css/theme-sos.css"/>
         <!-- EOF CSS INCLUDE -->        
@@ -113,7 +112,7 @@
 <script type="text/javascript">
 function save_claim() {
 //	alert('save');
-	$.post(<?php echo json_encode($this->own_link.'/save_claim'); ?>, {
+	$.post('<?php echo $this->own_link."/save_claim"?>', {
 		claim_date 				: $('#claim_date').val(),
 		claim_memberid			: $('#claim_memberid').val(),
 		claim_clientid			: $('#claim_clientid').val(),
@@ -121,16 +120,14 @@ function save_claim() {
 		claim_relationshiptype	: $('#claim_relationshiptype').val(),
 		claim_roomclass			: $('#claim_roomclass').val(),
 		claim_servicetype		: $('#claim_servicetype').val()			
-	}, function(obj) {
-		var response = typeof obj === 'string' ? JSON.parse(obj) : obj;
-		var message = encodeURIComponent(String(response.message || ''));
-		var destination = <?php echo json_encode($this->own_link.'?msg='); ?> + message;
-		if(response.status == 1) {
+	}, function( obj ) {
+		o = eval('('+obj+')');
+		if(o.status == 1) { 
 			window.close();
-			window.opener.location.assign(destination + '&type_msg=success');
-		} else {
+			window.opener.location.href = '<?php echo $this->own_link."?msg="?>'+o.message+'&type_msg=success'; 
+		} else { 
 			window.close();
-			window.opener.location.assign(destination + '&type_msg=danger');
+			window.opener.location.href = '<?php echo $this->own_link."?msg="?>'+o.message+'&type_msg=danger'; 
 		}
 	});		
 }

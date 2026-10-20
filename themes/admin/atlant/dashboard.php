@@ -297,7 +297,6 @@
 	    </div>
 	</div>
 </div>   
-<script type="text/javascript" src="<?php echo base_url();?>assets/js/vendor/highcharts/highcharts.js"></script>
 <script type="text/javascript">
 var URL_EXPORT_DATA_ACTIVE_MEMBER = '<?php echo $own_links;?>/export_data_active_member';
 var URL_EXPORT_DATA_SWIPE_BY_CLIENT = '<?php echo $own_links;?>/export_data_swipe_by_number';
@@ -317,31 +316,18 @@ $(document).ready(function(){
 	$('#panel-content-wrap').css('padding','0');
     $('#border-header').css('border','none');
 	$('.heading-form').css('fontSize','16px');
-	var transactionResponse = $.ajax({type:'GET', url:AJAX_URL+'/get_transactions/',async:false}).responseText;
-	var transactionData = [];
-	try {
-		var parsedTransactionData = JSON.parse(transactionResponse);
-		transactionData = Array.isArray(parsedTransactionData) ? parsedTransactionData : [];
-	} catch (error) {
-		transactionData = [];
-	}
-	if (window.Highcharts) {
-		Highcharts.chart('transaction-chart', {
-			chart: { type: 'column' },
-			title: { text: null },
-			xAxis: {
-				categories: transactionData.map(function(row) { return String(row[0] || ''); })
-			},
-			yAxis: { min: 0, title: { text: 'Jumlah' } },
-			tooltip: { shared: true },
-			credits: { enabled: false },
-			series: [
-				{ name: 'Week', data: transactionData.map(function(row) { return Number(row[1]) || 0; }) },
-				{ name: 'Month', data: transactionData.map(function(row) { return Number(row[2]) || 0; }) },
-				{ name: 'Year', data: transactionData.map(function(row) { return Number(row[3]) || 0; }) }
-			]
-		});
-	}
+	dt = $.ajax({type:'GET', url:AJAX_URL+'/get_transactions/',async:false}).responseText,
+	data = JSON.parse(dt);
+	var morrisCharts = function() {
+	    Morris.Bar({
+	        element: 'transaction-chart',
+	        data: data,
+	        xkey: 0,
+	        ykeys: [1,2,3],
+	        labels: ['Week', 'Month', 'Year'],
+	        barColors: ['#953202', '#4B7407', '#23788B']
+	    });
+	}();
 	getActiveMember();
 	getSwipeByClient();
 	getSwipeByProvider();

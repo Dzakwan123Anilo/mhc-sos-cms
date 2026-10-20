@@ -9,6 +9,10 @@ INPUTTAGS = {
 			defaultText: 'add a email',
 			removeWithBackspace: true
 		});
+
+		$( 'textarea#wysiwg_full' ).ckeditor({
+			filebrowserUploadUrl: '/upload_ckeditor.php'
+		});
     }
 }
 

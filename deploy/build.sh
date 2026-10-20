@@ -1,15 +1,15 @@
-#!/bin/sh
-set -eu
+echo "Step 1/2 : Building image..."
 
-echo "Step 1/2: Building image..."
+while read -r line
+do
+  export $line
+done < ".variables"
 
-if [ ! -f .variables ]; then
-  echo "Missing deploy/.variables. Copy .variables.example and set its secrets." >&2
-  exit 1
-fi
+IMAGE=$IMAGE_NAME
+TAG=$IMAGE_TAG
 
-set -a
-. ./.variables
-set +a
+docker rm --force $CONTAINER_NAME
 
-docker build -t "$IMAGE_NAME:$IMAGE_TAG" .
+docker rmi $IMAGE:$TAG
+
+docker build --quiet -t $IMAGE:$TAG .

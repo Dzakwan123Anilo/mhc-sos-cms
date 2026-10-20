@@ -1,18 +1,19 @@
-<?php
-$safe_file = basename((string) $file);
-$file_url = base_url().'assets/collections/file/'.rawurlencode($safe_file);
-?>
-<!DOCTYPE html>
-<html lang="id">
+<html>
   <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>File <?php echo htmlspecialchars($safe_file, ENT_QUOTES, 'UTF-8');?></title>
-    <style>html,body,iframe{border:0;height:100%;margin:0;padding:0;width:100%}p{font-family:sans-serif;padding:1rem}</style>
+    <title>File <?php echo $file?></title>
+    <script type="text/javascript" src="<?php echo themeUrl();?>/viewpdf/avg_ls_dom.js"></script>
+	<script type="text/javascript" src="<?php echo themeUrl();?>/viewpdf/pdfobject.js"></script>
+    <script type="text/javascript">
+
+      window.onload = function (){
+        var myPDF = new PDFObject({ url: "<?php echo base_url()?>assets/collections/file/<?php echo $file?>" }).embed();
+      };
+
+    </script>
   </head>
+ 
   <body>
-    <iframe src="<?php echo htmlspecialchars($file_url, ENT_QUOTES, 'UTF-8');?>" title="PDF <?php echo htmlspecialchars($safe_file, ENT_QUOTES, 'UTF-8');?>">
-      <p>Browser tidak mendukung pratinjau PDF. <a href="<?php echo htmlspecialchars($file_url, ENT_QUOTES, 'UTF-8');?>">Unduh PDF</a>.</p>
-    </iframe>
+    <p>If it appears you don't have Adobe Reader or PDF support in this web
+    browser. <a href="<?php echo base_url()?>assets/collections/file/<?php echo $file?>">Click here to download the PDF</a></p>
   </body>
 </html>

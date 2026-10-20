@@ -139,36 +139,6 @@ class MY_Controller extends CI_Controller{
 		$this->sCfg['referer'] = $url;
 		$this->_releaseSession();
 	}
-
-	/**
-	 * Accept only local paths or absolute URLs on the configured application origin.
-	 */
-	protected function _safe_redirect_url($candidate, $fallback = ''){
-		$fallback = $fallback !== '' ? $fallback : site_url();
-		$candidate = trim((string) $candidate);
-		if ($candidate === '' || preg_match('/[\\x00-\\x1F\\x7F\\\\]/', $candidate) || strpos($candidate, '//') === 0) {
-			return $fallback;
-		}
-
-		$target = @parse_url($candidate);
-		if ($target === false || isset($target['user']) || isset($target['pass'])) {
-			return $fallback;
-		}
-
-		if (isset($target['scheme']) || isset($target['host'])) {
-			$origin = @parse_url(base_url());
-			$target_port = isset($target['port']) ? (int) $target['port'] : null;
-			$origin_port = isset($origin['port']) ? (int) $origin['port'] : null;
-			if (!isset($target['scheme'], $target['host'], $origin['scheme'], $origin['host'])
-				|| strcasecmp($target['scheme'], $origin['scheme']) !== 0
-				|| strcasecmp($target['host'], $origin['host']) !== 0
-				|| $target_port !== $origin_port) {
-				return $fallback;
-			}
-		}
-
-		return $candidate;
-	}
 	
 	function setMessage($message=''){
 		$this->sCfg['message'] = $message;
@@ -239,78 +209,84 @@ class MY_Controller extends CI_Controller{
 
 	
 	function sendEmail($p=array()){
-		return $this->send_email($p);
+		$this->load->library('email');
+		/*mail method */
+		$config['protocol'] = 'mail';
+		$config['mailtype'] = isset($p['type'])?$p['type']:'html';
+		$config['charset'] = 'utf-8';
+		$config['wordwrap'] = TRUE;
+		$config['priority'] = isset($p['priority'])?$p['priority']:3; 
+		
+		/*smtp method */
+		/*$config['protocol']  = 'mail';
+		$config['smtp_host'] = 'smtp.gmail.com';
+		$config['smtp_port'] = 465;
+		$config['smtp_user'] = 'hhumaedi@gmail.com';
+		$config['smtp_pass'] = '*****';
+		$config['priority']  = 1;
+		$config['mailtype']  = 'html';
+		$config['charset']   = 'utf-8';
+		$config['wordwrap']  = TRUE;*/
+		
+		/* send mail method */ 
+		/*$config['protocol'] = 'sendmail';
+		$config['mailtype'] = 'html';
+		$config['charset']  = 'utf-8';
+		$config['wordwrap'] = TRUE;
+		*/
+		$this->email->initialize($config);
+
+		$this->email->from($p['from'], isset($p['title'])?$p['title']:'Hondacommunity');
+		$this->email->to($p['to']);
+		if( isset($p['cc']) && trim($p['cc']) != "" ){			
+			$this->email->cc($p['cc']); 
+		}
+		$this->email->subject('Hondacommunity : '.$p['subject']);
+		$this->email->message($p['message']);
+		
+		if(isset($p['alt_message']) && trim($p['alt_message'])!='' ){
+			$this->email->set_alt_message($p['alt_message']);
+		}
+		
+		$this->email->send();
+		//debugCode($this->email->print_debugger());
+		
 	}
 	
 	function send_email($p=array()) {
 		$this->load->library('MyPHPMailer');
-
-		$host = trim((string) cfg('smtp_host'));
-		$from = trim((string) (isset($p['from']) && $p['from'] !== '' ? $p['from'] : cfg('smtp_from')));
-		if ($host === '' || $from === '' || empty($p['to'])) {
-			log_message('error', 'Email was not sent because SMTP_HOST, SMTP_FROM, or recipient is missing.');
-			return false;
+		
+		if(isset($p['cc']) && !empty($p['cc'])) {
+			$cc = explode(',', $p['cc']); 
+			$ccname = explode(',', (empty($p['cctitle'])?$p['cctitle']:''));
 		}
-
-		try {
-			$mail = new MyPHPMailer(true);
-			$mail->isSMTP();
-			$mail->SMTPDebug = 0;
-			$mail->Host = $host;
-			$mail->Port = (int) cfg('smtp_port');
-			$mail->CharSet = 'UTF-8';
-			$mail->XMailer = 'MHC SOS';
-
-			$username = (string) cfg('smtp_username');
-			$password = (string) cfg('smtp_password');
-			$mail->SMTPAuth = $username !== '';
-			if ($mail->SMTPAuth) {
-				$mail->Username = $username;
-				$mail->Password = $password;
+		
+		$mail = new PHPMailer();
+		$mail->IsSMTP();
+		$mail->SMTPAuth   = true;
+		$mail->SMTPSecure = "tls";
+		
+		$mail->SMTPDebug  = 1;		
+		$mail->Host       = "mail.landson.co.id";
+		$mail->Port       = 587;
+		$mail->Username   = "datacenter@landson.co.id";
+		$mail->Password   = "TkO7;J&=-=E-";
+		$mail->SetFrom($p['from'], (empty($p['title'])?$p['title']:''));
+		
+		if(!empty($cc)) {
+			for($i=0; $i<count($cc); $i++) {
+				$mail->AddCC($cc[$i], $ccname[$i]);
 			}
-
-			$secure = strtolower(trim((string) cfg('smtp_secure')));
-			if ($secure === 'tls') {
-				$mail->SMTPSecure = MyPHPMailer::ENCRYPTION_STARTTLS;
-			} elseif ($secure === 'ssl' || $secure === 'smtps') {
-				$mail->SMTPSecure = MyPHPMailer::ENCRYPTION_SMTPS;
-			} else {
-				$mail->SMTPSecure = '';
-				$mail->SMTPAutoTLS = false;
-			}
-
-			$mail->setFrom($from, isset($p['title']) ? $p['title'] : (string) cfg('smtp_from_name'));
-			if (!empty($p['cc'])) {
-				$cc_addresses = array_map('trim', explode(',', $p['cc']));
-				$cc_names = !empty($p['cctitle']) ? array_map('trim', explode(',', $p['cctitle'])) : array();
-				foreach ($cc_addresses as $index => $address) {
-					if ($address !== '') {
-						$mail->addCC($address, isset($cc_names[$index]) ? $cc_names[$index] : '');
-					}
-				}
-			}
-
-			$mail->Subject = isset($p['subject']) ? $p['subject'] : '';
-			$mail->msgHTML(isset($p['message']) ? $p['message'] : '');
-
-			$recipients = is_array($p['to']) ? $p['to'] : array($p['to']);
-			$recipient_names = isset($p['totitle']) && is_array($p['totitle']) ? $p['totitle'] : array();
-			$recipient_title = isset($p['totitle']) && !is_array($p['totitle']) ? (string) $p['totitle'] : '';
-			foreach ($recipients as $index => $recipient) {
-				$recipient = trim((string) $recipient);
-				if ($recipient !== '') {
-					$name = isset($recipient_names[$index]) ? $recipient_names[$index] : $recipient_title;
-					$mail->addAddress($recipient, (string) $name);
-				}
-			}
-			if (count($mail->getToAddresses()) === 0) {
-				throw new InvalidArgumentException('At least one valid recipient is required.');
-			}
-			return $mail->send();
-		} catch (Throwable $exception) {
-			log_message('error', 'Unable to send notification email: '.$exception->getMessage());
-			return false;
 		}
+		$mail->Subject = $p['subject'];
+		$mail->MsgHTML($p['message']);
+		$mail->AddAddress($p['to'], (empty($p['totitle'])?$p['totitle']:''));
+		
+		if($mail->Send()) {
+			$mail->ClearAddresses();
+			
+			return true;
+		} else return false;
 	}
 
 	function get_list_user(){
@@ -395,7 +371,7 @@ class MY_Controller extends CI_Controller{
 	function _data($m=array()){
 		
 		$this->load->library('pagination');
-		$config['cur_page'] = isset($m['page']) ? (string) $m['page'] : '0';
+		$config['page'] = isset($m['page'])?$m['page']:0;
 		$config['per_page'] = $this->per_page;
 		$data = $this->data_table;
 		$config['base_url'] = $m['base_url'];
@@ -496,8 +472,8 @@ class MY_Controller extends CI_Controller{
 		$curr_class = isset($this->jCfg['current_class'])?$this->jCfg['current_class']:'';
 		if(!empty($id) && $flag_ins==TRUE && $curr_class !="chat" ){
 			
-			$POST = json_encode($this->_redact_log_values(isset($_POST) ? $_POST : array()));
-			$GET = json_encode($this->_redact_log_values(isset($_GET) ? $_GET : array()));
+			$POST=isset($_POST)?json_encode($_POST):"";
+			$GET=isset($_GET)?json_encode($_GET):"";
 			$arr_method = array(
 				"detail_member","detail_advertiser","cek_advertiser_username",
 				"search","get_ads","detail_iklan","get_tag","report","get_tag",
@@ -520,24 +496,6 @@ class MY_Controller extends CI_Controller{
 				));
 			}
 		}
-	}
-
-	/**
-	 * Prevent credentials and authentication tokens from being persisted in app_log.
-	 */
-	protected function _redact_log_values($values){
-		$result = array();
-		foreach ((array) $values as $key => $value) {
-			if (preg_match('/(?:pass(?:word)?|secret|token|captcha|authorization|cookie|api[_-]?key|\bkey\b)/i', (string) $key)) {
-				$result[$key] = '[REDACTED]';
-			} elseif (is_array($value)) {
-				$result[$key] = $this->_redact_log_values($value);
-			} else {
-				$result[$key] = $value;
-			}
-		}
-
-		return $result;
 	}
 	
 }

@@ -1,12 +1,18 @@
 <?php
 /* database config */ 
 
-$host = getenv('DB_HOST') ?: 'localhost';
-$port = getenv('DB_PORT') ?: '3306';
-$username = getenv('DB_USERNAME') ?: '';
-$password = getenv('DB_PASSWORD') ?: '';
-$name = getenv('DB_NAME') ?: '';
-$driver = getenv('DB_DRIVER') ?: 'mysqli';
+//$cfg['db']['hostname'] = $_SERVER['MYSQL_HOST'];
+//$cfg['db']['username'] = $_SERVER['MYSQL_USER'];
+//$cfg['db']['password'] = $_SERVER['MYSQL_PASSWORD'];
+//$cfg['db']['database'] = $_SERVER['MYSQL_DATABASE'];
+//$cfg['db']['port'] 	   = $_SERVER['MYSQL_PORT'];
+
+$host = getenv('DB_HOST');
+$port = getenv('DB_PORT');
+$username = getenv('DB_USERNAME');
+$password = getenv('DB_PASSWORD');
+$name = getenv('DB_NAME');
+$driver = getenv('DB_DRIVER');
 
 $cfg['db']['hostname'] = "$host:$port";
 $cfg['db']['username'] = $username;
@@ -24,32 +30,14 @@ $config['modules_locations'] = array(
 $config['template_web']     = 'default';
 $config['template_admin']   = 'atlant';
 
-$config['mycript']          = true;
-$config['encryption_key']   = getenv('ENCRYPTION_KEY') ?: '';
+$config['mycript']          = true; 
+$config['encryption_key']   = getenv('ENCRYPTION_KEY') ?: 'b8Xk2Np7VmR5qLwYzT3AnFc6UdE9hJ4S';
 
 $config['activeLog']        = true;
 $config['activeChat']       = false;
 
-/* Authentication hardening. Values can be overridden by deployment env vars. */
-$config['auth_rate_limit_attempts'] = max(1, (int) (getenv('AUTH_RATE_LIMIT_ATTEMPTS') ?: 5));
-$config['auth_rate_limit_window'] = max(60, (int) (getenv('AUTH_RATE_LIMIT_WINDOW') ?: 900));
-$config['auth_rate_limit_lockout'] = max(60, (int) (getenv('AUTH_RATE_LIMIT_LOCKOUT') ?: 900));
-$config['auth_captcha_ttl'] = max(60, (int) (getenv('AUTH_CAPTCHA_TTL') ?: 300));
-
-/* SMTP credentials must be provided by the deployment environment. */
-$config['smtp_host'] = getenv('SMTP_HOST') ?: '';
-$config['smtp_port'] = max(1, (int) (getenv('SMTP_PORT') ?: 587));
-$config['smtp_username'] = getenv('SMTP_USERNAME') ?: '';
-$config['smtp_password'] = getenv('SMTP_PASSWORD') ?: '';
-$config['smtp_secure'] = getenv('SMTP_SECURE') ?: 'tls';
-$config['smtp_from'] = getenv('SMTP_FROM') ?: $config['smtp_username'];
-$config['smtp_from_name'] = getenv('SMTP_FROM_NAME') ?: 'MHC SOS';
-
-$config['base_url']         = rtrim(getenv('APP_BASE_URL') ?: "http://localhost:3004/", '/').'/';
-$config['cookie_secure']    = strtolower((string) parse_url($config['base_url'], PHP_URL_SCHEME)) === 'https';
-$config['sess_regenerate_destroy'] = true;
-$config['proxy_ips']        = getenv('TRUSTED_PROXY_IPS') ?: '';
-//$config['base_url']         = "https://mhc.internationalsos.co.id/";
+//$config['base_url']         = "http://128.199.123.216/";
+$config['base_url']         = "https://mhc.internationalsos.co.id/";
 //$config['domain']  = $_SERVER['SERVER_NAME'];
 //$config['domain']           = 'hondacbrcommunity.com';
 $config['domain'] = 'sos.co.id';

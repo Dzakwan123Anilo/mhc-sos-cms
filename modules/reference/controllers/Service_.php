@@ -32,7 +32,9 @@ class Service extends AdminController {
 			'plugins/bootstrap/bootstrap-datepicker.js',
 			'plugins/bootstrap/bootstrap-file-input.js',
 			'plugins/bootstrap/bootstrap-select.js',
-			'plugins/tagsinput/jquery.tagsinput.min.js'
+			'plugins/tagsinput/jquery.tagsinput.min.js',
+			'ckeditor/ckeditor.js',
+			'ckeditor/adapters/jquery.js'
 		);
  		
  		$this->load->model("mdl_reference","M");
@@ -163,3 +165,4 @@ class Service extends AdminController {
 	}
 
 }
+

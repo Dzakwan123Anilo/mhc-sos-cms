@@ -12,8 +12,6 @@
         
                 <!-- START PLUGINS -->
         <script type="text/javascript" src="<?php echo themeUrl();?>js/plugins/jquery/jquery.min.js"></script>
-        <script type="text/javascript" src="<?php echo themeUrl();?>js/plugins/jquery/jquery-migrate.min.js"></script>
-        <script type="text/javascript" src="<?php echo themeUrl();?>js/mhc-security.js"></script>
         <script type="text/javascript" src="<?php echo themeUrl();?>js/plugins/jquery/jquery-ui.min.js"></script>
         <script type="text/javascript" src="<?php echo themeUrl();?>js/plugins/bootstrap/bootstrap.min.js"></script>        
         <!-- END PLUGINS -->

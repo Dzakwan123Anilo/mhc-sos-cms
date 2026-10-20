@@ -70,6 +70,9 @@ ob_start();
 
 	// The controller function you wish to be called.
 	// $routing['function']	= '';
+?>
+
+<?php
 
 /*
  * -------------------------------------------------------------------
@@ -193,9 +196,8 @@ ob_start();
 	define('VIEWPATH', $view_folder);
   	define('ENVIRONMENT', 'production');
 	error_reporting(0);
-	ini_set('display_errors', 0);
+        ini_set('display_errors', 0);
 	define('SHOW_DEBUG_BACKTRACE', FALSE);
-
 /*
  * --------------------------------------------------------------------
  * LOAD THE BOOTSTRAP FILE

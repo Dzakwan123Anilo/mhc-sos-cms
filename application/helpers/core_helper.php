@@ -1,10 +1,4 @@
 <?php
-if (!function_exists('sos_escape_html')) {
-	function sos_escape_html($value){
-		return htmlspecialchars((string)$value, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
-	}
-}
-
 function getCI(){
 	$CI =& get_instance();
 	return $CI; 
@@ -402,17 +396,14 @@ function get_info_message(){
 		function hidden_msg(){
 			$('#alert_top').fadeOut();
 		}
-		setTimeout(hidden_msg, 4000);
+		setTimeout('hidden_msg()',4000);
 		</script>
 	<?php } 
 }
 
 function validate_password_strength($password) {
-	if (strlen($password) < 12) {
-		return 'Password minimal 12 karakter';
-	}
-	if (strlen($password) > 128) {
-		return 'Password maksimal 128 karakter';
+	if (strlen($password) < 8) {
+		return 'Password minimal 8 karakter';
 	}
 	if (!preg_match('/[A-Z]/', $password)) {
 		return 'Password harus mengandung huruf kapital';
@@ -426,87 +417,68 @@ function validate_password_strength($password) {
 	if (!preg_match('/[^a-zA-Z0-9]/', $password)) {
 		return 'Password harus mengandung karakter spesial';
 	}
-
-	$normalized = strtolower($password);
-	$common_passwords = array(
-		'password', 'password123', 'password123!', 'qwerty', 'qwerty123',
-		'admin', 'admin123', 'welcome', 'welcome123', '123456', '12345678'
-	);
-	if (in_array($normalized, $common_passwords, true)) {
-		return 'Password terlalu umum dan mudah ditebak';
-	}
-	if (preg_match('/(.)\\1{4,}/', $password)) {
-		return 'Password tidak boleh mengandung karakter berulang yang mudah ditebak';
-	}
-
 	return true;
 }
 
-function _application_crypto_key(){
-	$key = (string) cfg('encryption_key');
-	if (strlen($key) < 32) {
-		throw new RuntimeException('ENCRYPTION_KEY must contain at least 32 characters.');
-	}
-
-	return hash('sha256', $key, true);
-}
-
 function _encrypt($data = ""){
-	$cipher = 'aes-256-gcm';
-	$iv = random_bytes(12);
-	$tag = '';
-	$encrypted = openssl_encrypt(
-		(string) ($data ?? ''),
-		$cipher,
-		_application_crypto_key(),
-		OPENSSL_RAW_DATA,
-		$iv,
-		$tag,
-		'mhc-sos-url-token',
-		16
-	);
-	if ($encrypted === false) {
-		throw new RuntimeException('Unable to encrypt application token.');
-	}
+	$CI =getCI();
+	// if( cfg('mycript') == true ){
+    
+	// 	$CI->load->library('encrypt');
+	// 	$nid = "meme#".$key."#".cfg('app_name').date("Ymd");
+	// 	return urlencode($CI->encrypt->encode($nid));
+	// }else{
+	// 	return $key;
+	// }
 
-	$payload = "\x01".$iv.$tag.$encrypted;
-	return rtrim(strtr(base64_encode($payload), '+/', '-_'), '=');
+  $data = $data ?? '';
+  
+  $key = "bWhjc29zMjAyNA";
+  // Menggunakan AES-256-CBC untuk enkripsi
+  $cipher = "AES-256-CBC";
+  // Generate IV secara acak dengan panjang sesuai algoritma
+  $iv = openssl_random_pseudo_bytes(openssl_cipher_iv_length($cipher));
+  // Enkripsi data
+  $encrypted = openssl_encrypt($data, $cipher, $key, 0, $iv);
+  // Menggabungkan IV dan data terenkripsi (IV harus disimpan bersama data terenkripsi)
+  $encrypted_with_iv = base64_encode($iv . $encrypted);
+
+  $encoded_resut = rawurlencode($encrypted_with_iv);
+
+  return $encoded_resut;
 }
 
 function _decrypt($encrypted_data=""){
-	$token = rawurldecode(trim((string) $encrypted_data));
-	if ($token === '' || !preg_match('/^[A-Za-z0-9_-]+$/', $token)) {
-		return false;
-	}
+	$CI =getCI();
+	// if( cfg('mycript') == true ){
+	// 	$CI->load->library('encrypt');
+	// 	$nid = urldecode($CI->encrypt->decode($key));
+	// 	$nid_arr = explode("#",$nid);
+	// 	if(isset($nid_arr[1])){
+	// 		return $nid_arr[1];
+	// 	}else{
+	// 		redirect($CI->own_link."?msg=Access Denied&type_msg=danger");
+	// 	}
+	// }else{
+	// 	return $key;
+	// }
 
-	$encoded = strtr($token, '-_', '+/');
-	$padding = strlen($encoded) % 4;
-	if ($padding !== 0) {
-		$encoded .= str_repeat('=', 4 - $padding);
-	}
+  $decoded_encrypted_data = rawurldecode($encrypted_data);
 
-	$payload = base64_decode($encoded, true);
-	if ($payload === false || strlen($payload) < 30 || $payload[0] !== "\x01") {
-		return false;
-	}
-	$canonical = rtrim(strtr(base64_encode($payload), '+/', '-_'), '=');
-	if (!hash_equals($canonical, $token)) {
-		return false;
-	}
+  $key = "bWhjc29zMjAyNA";
+  // Menggunakan AES-256-CBC untuk dekripsi
+  $cipher = "AES-256-CBC";
+  // Decode data dari base64
+  $data = base64_decode($decoded_encrypted_data);
+  // Panjang IV yang digunakan
+  $iv_length = openssl_cipher_iv_length(cipher_algo: $cipher);
+  // Pisahkan IV dan data terenkripsi
+  $iv = substr($data, 0, $iv_length);
+  $encrypted = substr($data, $iv_length);
+  // Dekripsi data
+  $decrypted = openssl_decrypt($encrypted, $cipher, $key, 0, $iv);
 
-	$iv = substr($payload, 1, 12);
-	$tag = substr($payload, 13, 16);
-	$encrypted = substr($payload, 29);
-
-	return openssl_decrypt(
-		$encrypted,
-		'aes-256-gcm',
-		_application_crypto_key(),
-		OPENSSL_RAW_DATA,
-		$iv,
-		$tag,
-		'mhc-sos-url-token'
-	);
+  return $decrypted;
 }
 function get_breadcrumb($par=array()){
 
@@ -588,7 +560,7 @@ function cat_search($m=array()){
 			if($key==$CI->jCfg['search']['colum'])
 				$s="selected='selected'";
 
-			echo "<option value='".sos_escape_html($key)."' $s >".sos_escape_html($value)."</option>";
+			echo "<option value='".$key."' $s >".$value."</option>";
 		}
 	}
 }
@@ -602,7 +574,7 @@ function cat_perpage($m=array()){
 			if($value==$CI->jCfg['search']['per_page'])
 				$s="selected='selected'";
 
-			echo "<option value='".sos_escape_html($value)."' $s >".sos_escape_html($value)."</option>";
+			echo "<option value='".$value."' $s >".$value."</option>";
 		}
 	}
 	echo "</select>";
@@ -610,13 +582,8 @@ function cat_perpage($m=array()){
 	<script type="text/javascript">
 
 	$('#per_page').change(function(){
-		var val = $(this).val();
-		var target = <?php echo json_encode($CI->own_link.'/per_page', JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT);?>
-			+ '?per_page=' + encodeURIComponent(val)
-			+ '&next=' + encodeURIComponent(window.location.href);
-		if (window.MHC && typeof window.MHC.navigate === 'function') {
-			window.MHC.navigate(target);
-		}
+		val = $(this).val();
+		document.location = "<?php echo $CI->own_link;?>/per_page?per_page="+val+"&next=<?php echo current_url();?>";
 	});
 	</script>
 	<?php
@@ -632,7 +599,7 @@ function cat_status($m=array()){
 			if($value==$CI->jCfg['search']['status'])
 				$s="selected='selected'";
 
-			echo "<option value='".sos_escape_html($value)."' $s >".sos_escape_html($value)."</option>";
+			echo "<option value='".$value."' $s >".$value."</option>";
 		}
 	}
 	echo "</select>";
@@ -640,13 +607,8 @@ function cat_status($m=array()){
 	<script type="text/javascript">
 
 	$('#data_status').change(function(){
-		var val = $(this).val();
-		var target = <?php echo json_encode($CI->own_link.'/set_status', JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT);?>
-			+ '?status=' + encodeURIComponent(val)
-			+ '&next=' + encodeURIComponent(window.location.href);
-		if (window.MHC && typeof window.MHC.navigate === 'function') {
-			window.MHC.navigate(target);
-		}
+		val = $(this).val();
+		document.location = "<?php echo $CI->own_link;?>/set_status?status="+val+"&next=<?php echo current_url();?>";
 	});
 	</script>
 	<?php
@@ -712,8 +674,8 @@ function _dt($dt="30/01/2014"){
 }
 function js_hight_chart(){	
 	?>
-		<script src="<?php echo base_url();?>assets/js/vendor/highcharts/highcharts.js" type="text/javascript"></script>
-		<script src="<?php echo base_url();?>assets/js/vendor/highcharts/exporting.js" type="text/javascript"></script>
+		<script src="<?php echo base_url();?>assets/js/cart/js/highcharts.js" type="text/javascript"></script>
+		<script src="<?php echo base_url();?>assets/js/cart/js/modules/exporting.js" type="text/javascript"></script>
 	<?php
 }
 
@@ -1015,7 +977,10 @@ function getCity($id=""){
 	$CI  = getCI();
 	$city = "";
 	if(trim($id)!=""){
-		$q = $CI->db->get_where('app_city', array('city_id' => $id), 1)->row();
+		$q = $CI->db->query("
+			SELECT * FROM app_city WHERE city_id='".$id."'
+			LIMIT 0,1
+		")->row();
 		if(count($q) > 0){
 			$city = $q->city_title;
 		}
@@ -1026,7 +991,6 @@ function getCity($id=""){
 
 function option_propinsi($prov=""){
 	$CI  = getCI();
-	$callback = '';
 	
 	$CI->db->order_by('propinsi_nama','ASC');
 	$q = $CI->db->get("app_propinsi")->result();
@@ -1034,7 +998,7 @@ function option_propinsi($prov=""){
 	if( count($q) > 0 ){
 		foreach ($q as $key => $value) {
 			$selected = $value->propinsi_id==$prov?"selected='selected'":"";
-			$callback .= "<option value='".sos_escape_html($value->propinsi_id)."' $selected >".sos_escape_html($value->propinsi_nama)."</option>";
+			$callback .= "<option value='".$value->propinsi_id."' $selected >".$value->propinsi_nama."</option>";
 		}
 	}
 	return $callback;		
@@ -1042,7 +1006,6 @@ function option_propinsi($prov=""){
 
 function option_province($prov=""){
 	$CI  = getCI();
-	$callback = '';
 	
 	$CI->db->order_by('propinsi_nama','ASC');
 	$q = $CI->db->get("app_propinsi")->result();
@@ -1050,8 +1013,7 @@ function option_province($prov=""){
 	if( count($q) > 0 ){
 		foreach ($q as $key => $value) {
 			$selected = $value->propinsi_nama==$prov?"selected='selected'":"";
-			$name = sos_escape_html($value->propinsi_nama);
-			$callback .= "<option value='".$name."' $selected >".$name."</option>";
+			$callback .= "<option value='".$value->propinsi_nama."' $selected >".$value->propinsi_nama."</option>";
 		}
 	}
 	return $callback;		
@@ -1059,7 +1021,6 @@ function option_province($prov=""){
 
 function option_kab($city=""){
 	$CI  = getCI();
-	$callback = '';
 	
 	$CI->db->order_by('kab_nama','ASC');
 	$q = $CI->db->get("app_kabupaten")->result();
@@ -1067,8 +1028,7 @@ function option_kab($city=""){
 	if( count($q) > 0 ){
 		foreach ($q as $key => $value) {
 			$selected = $value->kab_nama==$city?"selected='selected'":"";
-			$name = sos_escape_html($value->kab_nama);
-			$callback .= "<option value='".$name."' $selected >".$name."</option>";
+			$callback .= "<option value='".$value->kab_nama."' $selected >".$value->kab_nama."</option>";
 		}
 	}
 	return $callback;		
@@ -1077,27 +1037,22 @@ function option_kab($city=""){
 
 function option_city($p=array()){
 	if(isset($p['prov_selector']) && trim($p['prov_selector'])!=""){
-		$province_selector = '#' . (string)$p['prov_selector'];
-		$city_selector = '#' . (string)$p['city_selector'];
-		$data_url = modUri() . 'data/';
-		$initial_city = isset($p['city']) && trim($p['city'])!="" ? $p['city'] : 'no city';
 	?>
 		<script type="text/javascript">
-		var DATA_URL = <?php echo json_encode($data_url, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT);?>;
-		var PROVINCE_SELECTOR = <?php echo json_encode($province_selector, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT);?>;
-		var CITY_SELECTOR = <?php echo json_encode($city_selector, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT);?>;
+		var DATA_URL = '<?php echo modUri();?>data/';
 		$(document).ready(function(){
-			$(PROVINCE_SELECTOR).change(function(){
+			$('#<?php echo $p['prov_selector'];?>').change(function(){
 				_get_city($(this).val());
 			});
 
-			_get_city($(PROVINCE_SELECTOR).val(), <?php echo json_encode($initial_city, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT);?>);
+			<?php $p['city'] = isset($p['city']) && trim($p['city'])!=""?$p['city']:'no city';?>
+			_get_city($('#<?php echo $p['prov_selector'];?>').val(),'<?php echo $p['city'];?>');
 		});
 		function _get_city(prov,city){
 			city = city==undefined?'':city;
 			prov = prov==undefined?'':prov;
 			$.post(DATA_URL+'get_city/'+prov,{city:city},function(o){
-				$(CITY_SELECTOR).html(o);
+				$('#<?php echo $p['city_selector'];?>').html(o);
 			});
 		}
 
@@ -1110,7 +1065,10 @@ function getProvince($id=""){
 	$CI  = getCI();
 	$province = "";
 	if(trim($id)!=""){
-		$q = $CI->db->get_where('app_province', array('province_id' => $id), 1)->row();
+		$q = $CI->db->query("
+			SELECT * FROM app_province WHERE province_id='".$id."'
+			LIMIT 0,1
+		")->row();
 		if(count($q) > 0){
 			$province = $q->province_title;
 		}
@@ -1240,7 +1198,7 @@ function option_domains($dom=""){
 	if( count($q) > 0 ){
 		foreach ($q as $key => $value) {
 			$selected = $value->site_id==$dom?"selected='selected'":"";
-			$callback .= "<option value='".sos_escape_html($value->site_id)."' $selected >".sos_escape_html($value->site_name)."</option>";
+			$callback .= "<option value='".$value->site_id."' $selected >".$value->site_name."</option>";
 		}
 	}
 	return $callback;		
@@ -1258,7 +1216,7 @@ function option_client($cli=""){
 	if( count($q) > 0 ){
 		foreach ($q as $key => $value) {
 			$selected = $value->client_id==$cli?"selected='selected'":"";
-			$callback .= "<option value='".sos_escape_html($value->client_id)."' $selected >".sos_escape_html($value->client_name)."</option>";
+			$callback .= "<option value='".$value->client_id."' $selected >".$value->client_name."</option>";
 		}
 	}
 	return $callback;		
@@ -1276,7 +1234,7 @@ function option_provider($id=""){
 	if( count($q) > 0 ){
 		foreach ($q as $key => $value) {
 			$selected = $value->provider_id==$id?"selected='selected'":"";
-			$callback .= "<option value='".sos_escape_html($value->provider_id)."' $selected >".sos_escape_html($value->provider_name)."</option>";
+			$callback .= "<option value='".$value->provider_id."' $selected >".$value->provider_name."</option>";
 		}
 	}
 	return $callback;		
@@ -1294,7 +1252,7 @@ function option_providertype($type=""){
 	if( count($q) > 0 ){
 		foreach ($q as $key => $value) {
 			$selected = $value->protype_type==$type?"selected='selected'":"";
-			$callback .= "<option value='".sos_escape_html($value->protype_type)."' $selected > [ ".sos_escape_html($value->protype_type)." ] ".sos_escape_html($value->protype_description)."</option>";
+			$callback .= "<option value='".$value->protype_type."' $selected > [ ".$value->protype_type." ] ".$value->protype_description."</option>";
 		}
 	}
 	return $callback;		
@@ -1312,7 +1270,7 @@ function option_plantype($id=""){
 	if( count($q) > 0 ){
 		foreach ($q as $key => $value) {
 			$selected = $value->plan_id==$id?"selected='selected'":"";
-			$callback .= "<option value='".sos_escape_html($value->plan_id)."' $selected >[ ".sos_escape_html($value->plan_type)." ] ".sos_escape_html($value->plan_description)."</option>";
+			$callback .= "<option value='".$value->plan_id."' $selected >[ ".$value->plan_type." ] ".$value->plan_description."</option>";
 		}
 	}
 	return $callback;		
@@ -1333,7 +1291,7 @@ function option_servicetype($id="",$cid=""){
 	if( count($q) > 0 ){
 		foreach ($q as $key => $value) {
 			$selected = $value->service_id==$id?"selected='selected'":"";
-			$callback .= "<option value='".sos_escape_html($value->service_id)."' $selected >".sos_escape_html($value->service_type)."</option>";
+			$callback .= "<option value='".$value->service_id."' $selected >".$value->service_type."</option>";
 		}
 	}
 	return $callback;		
@@ -1359,8 +1317,7 @@ function option_relationshiptype($relate=""){
 	if( count($q) > 0 ){
 		foreach ($q as $key => $value) {
 			$selected = $value->relationship_type==$relate?"selected='selected'":"";
-			$name = sos_escape_html($value->relationship_type);
-			$callback .= "<option value='".$name."' $selected >".$name."</option>";
+			$callback .= "<option value='".$value->relationship_type."' $selected >".$value->relationship_type."</option>";
 		}
 	}
 	return $callback;		
@@ -1378,8 +1335,7 @@ function option_employmentstatus($relate=""){
 	if( count($q) > 0 ){
 		foreach ($q as $key => $value) {
 			$selected = $value->employment_activated==$relate?"selected='selected'":"";
-			$name = sos_escape_html($value->employment_activated);
-			$callback .= "<option value='".$name."' $selected >".$name."</option>";
+			$callback .= "<option value='".$value->employment_activated."' $selected >".$value->employment_activated."</option>";
 		}
 	}
 	return $callback;		
@@ -1391,3 +1347,4 @@ function get_role_name($role_id=""){
 	$m = $CI->db->get("app_acl_group")->row();
 	return isset($m->ag_group_name)?$m->ag_group_name:'';
 }
+

@@ -179,26 +179,6 @@ class User extends AdminController {
 	function save(){
 
 		$site_id = $this->input->post('user_site_id');
-		$user_id = trim((string) $this->input->post('user_id'));
-		$raw_pass = (string) $this->input->post('user_password');
-		$pass_confirmation = (string) $this->input->post('user_password2');
-
-		if ($user_id === '' && $raw_pass === '') {
-			redirect($this->own_link.'?msg='.rawurlencode('Password wajib diisi untuk pengguna baru').'&type_msg=error');
-			return;
-		}
-
-		if ($raw_pass !== '') {
-			$validation = validate_password_strength($raw_pass);
-			if ($validation !== true) {
-				redirect($this->own_link.'?msg='.rawurlencode($validation).'&type_msg=error');
-				return;
-			}
-			if (!hash_equals($raw_pass, $pass_confirmation)) {
-				redirect($this->own_link.'?msg='.rawurlencode('Konfirmasi password tidak sama').'&type_msg=error');
-				return;
-			}
-		}
 		$data = array(
 			'user_fullname'			=> $this->input->post('user_fullname'),
 			'user_name'				=> $this->input->post('user_name'),
@@ -211,16 +191,20 @@ class User extends AdminController {
 		);		
 		
 
-		if ($raw_pass !== '') {
-			$data['user_password'] = password_hash($raw_pass, PASSWORD_ARGON2ID);
+		if( isset($_POST['user_password']) && trim($_POST['user_password']) != ''){
+			$raw_pass = dbClean($_POST['user_password']);
+			$validation = validate_password_strength($raw_pass);
+			if($validation === true){
+				$data['user_password'] = password_hash($raw_pass, PASSWORD_ARGON2ID);
+			}
 		}
 		
 		$a = $this->_save_master( 
 			$data,
 			array(
-				'user_id' => dbClean($user_id)
+				'user_id' => dbClean($_POST['user_id'])
 			),
-			dbClean($user_id)
+			dbClean($_POST['user_id'])			
 		);
 
 		$id = $a['id'];

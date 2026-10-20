@@ -49,7 +49,7 @@ themes/admin/atlant/         →  admin panel views
 themes/web/{name}/           →  public website views (template-driven)
 assets/                      →  static CSS/JS/images
 assets/collections/          →  uploaded files (gitignored)
-deploy/                      →  Dockerfile, nginx, fpm, supervisor configs
+deploy/                      →  Dockerfile (docker/), nginx, fpm, php, supervisor configs, docker-compose.yml
 ```
 
 ### Module Inventory
@@ -267,7 +267,7 @@ Modules typically load ONE model: `$this->load->model("mdl_{module}","M")`. The 
 - Authentication requires a server-side CAPTCHA and applies file-backed rate limits by IP address and username.
 - CSRF protection is **disabled**. Enabling it will break the existing AJAX and form submissions unless all views are updated with CSRF tokens.
 - `adminer.php` remains in the source tree for controlled maintenance, but the production nginx configuration returns `404` for it and for every PHP file except `index.php`.
-- DB, SMTP, base URL, trusted proxies, and encryption key are deployment environment variables. Never commit `deploy/.variables`.
+- DB and encryption key are deployment environment variables set through `deploy/.env`. Never commit `deploy/.env`.
 
 ### Ad-Hoc Helpers
 
@@ -276,10 +276,11 @@ Many utility functions in `core_helper.php` and `sos_helper.php` reference hardc
 ### Docker
 
 ```
-deploy/start.sh        →  validates variables, builds the image, then starts the restricted-port container
-deploy/build.sh        →  reads .variables, runs docker build
-deploy/run.sh          →  reads ignored .variables, publishes only APP_PORT, mounts CMS_SOURCE_PATH at /home/app, and uses a named session volume
-deploy/security-smoke.sh →  validates the PHP 8.4 image, vendored mail/Excel libraries, nginx headers, and sensitive-file denial rules
+deploy/docker/Dockerfile     →  PHP 8.4 FPM + Alpine 3.21 image (nginx, supervisor)
+deploy/docker/entrypoint.sh  →  prepares session and upload directories
+deploy/docker-compose.yml    →  single cms service, host network, mounts project at /home/app
+deploy/fpm/, deploy/nginx/, deploy/php/, deploy/supervisor/ → runtime configs
+deploy/.env                  →  gitignored; DB_* env vars, ENCRYPTION_KEY, CMS_SOURCE_PATH
 ```
 
-The `install.sh` runs `composer install` but there is no `composer.json` — this step will fail and is harmless. The container works without it.
+Start the stack with `docker compose up -d` from `deploy/`.

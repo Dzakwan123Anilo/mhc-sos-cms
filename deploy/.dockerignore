@@ -1,0 +1,13 @@
+*
+!docker
+!docker/Dockerfile
+!docker/entrypoint.sh
+!fpm
+!fpm/zz-docker.conf
+!php
+!php/docker-custom-php.ini
+!nginx
+!nginx/nginx.conf
+!nginx/default.conf
+!supervisor
+!supervisor/supervisord.conf

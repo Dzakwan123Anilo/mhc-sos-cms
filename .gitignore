@@ -2,3 +2,5 @@ sessions/*
 assets/tmp-report/*
 assets/collections/*
 assets/assets
+deploy/.env
+deploy/.variables

@@ -1,0 +1,26 @@
+services:
+  cms:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+    image: mhc/cms:latest
+    container_name: mhc-sos-cms
+    restart: always
+    network_mode: host
+    environment:
+      DB_HOST: ${DB_HOST}
+      DB_PORT: ${DB_PORT}
+      DB_USERNAME: ${DB_USERNAME}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_NAME: ${DB_NAME}
+      DB_DRIVER: ${DB_DRIVER}
+      ENCRYPTION_KEY: ${ENCRYPTION_KEY}
+    volumes:
+      - /etc/timezone:/etc/timezone
+      - /etc/localtime:/etc/localtime
+      - ${CMS_SOURCE_PATH:-..}:/home/app
+      - sos-sessions:/home/app/sessions
+
+volumes:
+  sos-sessions:
+    name: sos-sessions

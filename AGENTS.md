@@ -231,7 +231,7 @@ Key tables (production data prefixes):
 
 ### Configuration
 
-- **Two config layers** for base URL: `application/config/config.php` sets `localhost:3004` (line 26); root `config.php` overrides to `https://mhc.internationalsos.co.id/` (line 40). The root value wins because `application/config/config.php` includes it at the end.
+- **Two config layers** for base URL: `application/config/config.php` reads `BASE_URL` with dev fallback `http://127.0.0.1:1880/` (line 26); root `config.php` reads `BASE_URL` with production fallback `https://mhc.internationalsos.co.id/`. The root value wins because `application/config/config.php` includes it at the end. Set `BASE_URL` in `deploy/.env` to control it via Docker.
 - All app-specific settings live in root `config.php:30-129` — add new keys there and read them with `cfg('key_name')`.
 - The `$config['subclass_prefix']` is `MY_` (the CI default). Do not change it.
 
@@ -280,7 +280,7 @@ deploy/docker/Dockerfile     →  PHP 8.4 FPM + Alpine 3.21 image (nginx, superv
 deploy/docker/entrypoint.sh  →  prepares session and upload directories
 deploy/docker-compose.yml    →  single cms service, host network, mounts project at /home/app
 deploy/fpm/, deploy/nginx/, deploy/php/, deploy/supervisor/ → runtime configs
-deploy/.env                  →  gitignored; DB_* env vars, ENCRYPTION_KEY, CMS_SOURCE_PATH
+deploy/.env                  →  gitignored; BASE_URL, DB_* env vars, ENCRYPTION_KEY, CMS_SOURCE_PATH
 ```
 
 Start the stack with `docker compose up -d` from `deploy/`.

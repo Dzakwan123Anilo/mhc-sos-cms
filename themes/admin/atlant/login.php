@@ -75,6 +75,21 @@
                     </div>-->
                     <div class="form-group">
                         <div class="col-md-12">
+                            <div class="input-group">
+                                <div class="input-group-addon">
+                                    <span class="fa fa-shield"></span>
+                                </div>
+                                <input type="text" value="" class="form-control" id="login_captcha" placeholder="Captcha" maxlength="5" autocomplete="off"/>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-md-12">
+                            <img src="/auth/captcha?t=<?php echo time();?>" id="captcha_img" height="50" style="display:block;margin:0 auto;cursor:pointer;" title="Klik untuk ganti captcha"/>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-md-12">
                             <button class="btn btn-primary btn-lg btn-block" id="btn_login">Log In</button>
                         </div>
                     </div>
@@ -100,7 +115,9 @@
 
 <script type="text/javascript">
 
-  var AUTH_URL = '<?php echo site_url("auth/act_auth");?>';
+  var AUTH_URL = '/auth/act_auth';
+  var CAPTCHA_URL = '/auth/captcha';
+  var LOGIN_TOKEN = '<?php echo isset($login_token)?$login_token:''; ?>';
 
 </script>
 

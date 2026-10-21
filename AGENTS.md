@@ -267,6 +267,12 @@ Modules typically load ONE model: `$this->load->model("mdl_{module}","M")`. The 
 - Authentication requires a server-side CAPTCHA and applies file-backed rate limits by IP address and username.
 - CSRF protection is **disabled**. Enabling it will break the existing AJAX and form submissions unless all views are updated with CSRF tokens.
 - `adminer.php` remains in the source tree for controlled maintenance, but the production nginx configuration returns `404` for it and for every PHP file except `index.php`.
+- **Login brute-force defenses** (`Auth::act_auth`, enforced server-side):
+  - CAPTCHA selalu ditampilkan (`Auth::captcha()` renders GD image from `assets/captcha/`); kode disimpan di session, one-time consumption per attempt.
+  - Login token (scoped CSRF for the login form) di-generate `Auth::index()`, divalidasi `hash_equals`.
+  - Throttle per-IP (10 failure/15 menit) dan per-username (5 failure/15 menit) pada tabel `app_login_throttle` (key sha256; schema di `deploy/sql/001_app_login_throttle.sql`); sukses login mereset counter.
+  - `session_regenerate_id` dipanggil saat login sukses; nginx `limit_req` (`login_zone`, 5r/m burst 3) di `/auth/act_auth`.
+- **`app_log` never stores credentials** — `MY_Controller::_sanitizeLogVars()` strips any POST/GET key containing `pass`/`token`/`captcha` before writing `log_var_post`/`log_var_get`.
 - DB and encryption key are deployment environment variables set through `deploy/.env`. Never commit `deploy/.env`.
 
 ### Ad-Hoc Helpers

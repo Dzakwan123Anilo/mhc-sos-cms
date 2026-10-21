@@ -472,8 +472,8 @@ class MY_Controller extends CI_Controller{
 		$curr_class = isset($this->jCfg['current_class'])?$this->jCfg['current_class']:'';
 		if(!empty($id) && $flag_ins==TRUE && $curr_class !="chat" ){
 			
-			$POST=isset($_POST)?json_encode($_POST):"";
-			$GET=isset($_GET)?json_encode($_GET):"";
+			$POST=isset($_POST)?json_encode($this->_sanitizeLogVars($_POST)):"";
+			$GET=isset($_GET)?json_encode($this->_sanitizeLogVars($_GET)):"";
 			$arr_method = array(
 				"detail_member","detail_advertiser","cek_advertiser_username",
 				"search","get_ads","detail_iklan","get_tag","report","get_tag",
@@ -497,5 +497,16 @@ class MY_Controller extends CI_Controller{
 			}
 		}
 	}
-	
+
+	/* hilangkan nilai sensitif (password, token, captcha) sebelum dicatat ke app_log */
+	function _sanitizeLogVars($arr){
+		if( !is_array($arr) ) return array();
+		foreach (array_keys($arr) as $k) {
+			if( stripos($k, 'pass') !== FALSE || stripos($k, 'token') !== FALSE || stripos($k, 'captcha') !== FALSE ){
+				unset($arr[$k]);
+			}
+		}
+		return $arr;
+	}
+
 }

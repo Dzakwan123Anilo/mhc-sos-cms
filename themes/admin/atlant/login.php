@@ -121,7 +121,7 @@
 
 </script>
 
-<script src="<?php echo themeUrl();?>js/login.meme.js" type="text/javascript"></script>
+<script src="<?php echo themeUrl();?>js/login.meme.js?v=<?php echo filemtime(FCPATH."themes/admin/atlant/js/login.meme.js") ?: time();?>" type="text/javascript"></script>
 
 
     </body>
